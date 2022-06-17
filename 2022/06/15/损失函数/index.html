@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Reggie">
+
+
+
+
+
+<title>损失函数 | Reggie&#39;s blog</title>
+
+
+
+    <link rel="icon" href="/favicon.jpg">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+    <script src="/js/heart.js"></script>
+    
+
+
+
+    
+    
+        <!-- MathJax配置，可通过单美元符号书写行内公式等 -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+    "HTML-CSS": {
+        preferredFont: "TeX",
+        availableFonts: ["STIX","TeX"],
+        linebreaks: { automatic:true },
+        EqnChunk: (MathJax.Hub.Browser.isMobile ? 10 : 50)
+    },
+    tex2jax: {
+        inlineMath: [ ["$", "$"], ["\\(","\\)"] ],
+        processEscapes: true,
+        ignoreClass: "tex2jax_ignore|dno",
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        equationNumbers: { autoNumber: "AMS" },
+        noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } },
+        Macros: { href: "{}" }
+    },
+    messageStyle: "none"
+    });
+</script>
+<!-- 给MathJax元素添加has-jax class -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+<!-- 通过连接CDN加载MathJax的js代码 -->
+<script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+
+    
+
+
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Reggie&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Reggie&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6;    // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function () {
+            tocbot.refresh(obj_merge(tocbot_default_config, { hasInnerContainers: true }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function () {
+        tocbot.init(obj_merge(tocbot_default_config, { collapseDepth: 1 }));
+    });
+
+    function expandToc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, { collapseDepth: expanded ? 1 : DEPTH_MAX }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">损失函数</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Reggie</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">June 15, 2022&nbsp;&nbsp;9:35:04</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h2 id="三个常见的损失函数"><a href="#三个常见的损失函数" class="headerlink" title="三个常见的损失函数"></a>三个常见的损失函数</h2><table>
+<thead>
+<tr>
+<th>损失函数</th>
+<th>表达式</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>最小二乘法</td>
+<td>$\frac{1}{2}(y - \hat y) ^ 2$</td>
+</tr>
+<tr>
+<td>极大似然估计</td>
+<td>$-(y\log{\hat y} + (1 - y)\log(1 - \hat{y}) )$</td>
+</tr>
+<tr>
+<td>交叉熵损失</td>
+<td>$-(y\log{\hat y} + (1 - y)\log(1 - \hat{y}) )$</td>
+</tr>
+</tbody></table>
+<h2 id="损失函数的引出"><a href="#损失函数的引出" class="headerlink" title="损失函数的引出"></a>损失函数的引出</h2><p>损失函数定量衡量人脑和机器中的两个概率模型. 有一个现实例子可以很好滴拟合损失函数的价值. 在做数学或者其他学科的题目时, 有的时候我们写完一套题后会和答案进行对比, 看看结果相差多少. 这个过程和损失函数的工作原理是基本类似的. 以分类任务为例, 神经网络对提供的数据特征进行学习, 得到一个预测值 $\hat{y}$. 神经网络的训练过程就是通过比较预测值 $\hat y$ 和真实值 $y$ 之间的差异, 不断调整W和b的一个过程. 损失函数就是去定量比较预测值和真实值, 这也就解释了为什么在训练过程中我们通常就是对损失函数 $l$ 先求和再计算其梯度, 即 $l.sum().backward()$.</p>
+<h2 id="最小二乘法-均方误差"><a href="#最小二乘法-均方误差" class="headerlink" title="最小二乘法 (均方误差)"></a>最小二乘法 (均方误差)</h2><p>最小二乘法是最简单的一个方法. 通俗讲就是直接比较真实值和预测值之间的差距, 比较两个数的大小最常见的就是通过使用绝对值 (L1 Loss), 即 $ | y - \hat y |$. 但是绝对值在零点处不够平滑, 不可导, 这不利于函数收敛和模型的学习. 其优势在于它在0点外的其他地方都有很稳定的梯度, 不容易发生梯度爆炸, 具有很好的鲁棒性. 此外, 它对离散点的包容性很好, 对于离群点不那么敏感, 在一些简单的回归任务中表现的很好. </p>
+<img src="/2022/06/15/%E6%8D%9F%E5%A4%B1%E5%87%BD%E6%95%B0/%E7%BB%9D%E5%AF%B9%E5%80%BC.png" class="" title="L1-Loss">
+
+<p>用平方替换绝对值, 就是最小二乘法 (Least square method &#x2F; L2 Loss), 即 $\frac{1}{2}(y - \hat y) ^ 2$. 相比于L1, 最小二乘法在整个定义域上都比较平滑, 全程可导. 而且平方不会影响比较两个数值的大小关系. L2对应的是欧几里得距离(Euclidean distance), 它试图找到一条直线能够使得所有的数据点到直线的欧氏距离最小. 它是机器学习和深度学习中最为常用的一个. 从图可以看出, L2的梯度在每个点都不一样, 离得原点越远其梯度越大, 使用梯度下降法求解的时候梯度很大，可能导致梯度爆炸. 此外, 它对离群点很敏感, 因为平方的关系, 当误差大于1的时候, 它会把误差放大很多很多.</p>
+<img src="/2022/06/15/%E6%8D%9F%E5%A4%B1%E5%87%BD%E6%95%B0/L2.png" class="" title="L2-Loss">
+
+<table>
+<thead>
+<tr>
+<th>method</th>
+<th>鲁棒性</th>
+<th>离散点</th>
+<th>适用场景</th>
+<th>收敛速度</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>L1</td>
+<td>较好</td>
+<td>不敏感</td>
+<td>简单的回归任务</td>
+<td>较慢</td>
+</tr>
+<tr>
+<td>L2</td>
+<td>较差</td>
+<td>敏感</td>
+<td>回归任务</td>
+<td>较快</td>
+</tr>
+</tbody></table>
+<h2 id="极大似然估计"><a href="#极大似然估计" class="headerlink" title="极大似然估计"></a>极大似然估计</h2><p>极大似然估计是根据事实推理可能的概率模型. 先举了例子来解释一下什么是似然. 王木头提供了一个很好理解的一个例子, 即抛硬币. 我们都知道硬币正反面朝上的概率都是50%. 这50%指的是概率. 那么什么是似然呢? 假设我们不知道投硬币的概率, 投了10次硬币, 当硬币落地后正面or反面朝上已经成为一个事实, 有7个正面, 3个反面. 投了10次, 7正3反, 是不是说硬币的概率就一定是正面的概率是0.7, 反面的概率是0.3呢? 虽然这么想很符合我们的直觉, 但这并不是一件板上钉钉的事情. 你可以想一下, 假如说, 我们的硬币是正反概率都是0.5的话, 你抛10次, 难道就真的能保证一定是5次正, 5次反吗? 不一定吧, 出现6正4反, 4正6反也还是挺常见的吧.更甚者, 运气好到极点, 10次全部是正面也是有可能的. 那么, 当我们不知道硬币正反概率的时候, 7正3反, 就一定0.7的概率吗? 也不一定对吧. 完全有可能是, 硬币的概率是0.1正, 0.9反, 但是运气就是很好, 抛出了7正3反的结果. 或者是, 概率本来是0.8正, 0.2反, 但是运气就差那么一点, 抛出了7正3反。 </p>
+<img src="/2022/06/15/%E6%8D%9F%E5%A4%B1%E5%87%BD%E6%95%B0/%E4%BC%BC%E7%84%B61.png" class="" title="硬币">
+
+<p>总的来说, 在知道既定事实后, 我们虽然没有办法去确定该事实的概率模型, 但是它存在多种有可能的概率模型, 我们可以根据事实去计算每个可能概率模型下的结果, 结果越大越接近真实的概率模型. 投硬币是10次独立事件, 所以 $P(C_1, C_2, ……, C_{10} | \theta) &#x3D; \prod_{i &#x3D; 1}^{10}P(C_i | \theta)$. 至此我们就可以算出来当硬币抛出来正面朝上的概率分别是0.1, 0.7和0.8的时候, 要想得到抛10次硬币7次朝上的概率分布是多少.</p>
+<img src="/2022/06/15/%E6%8D%9F%E5%A4%B1%E5%87%BD%E6%95%B0/%E4%BC%BC%E7%84%B6.png" class="" title="硬币">
+<p>$0.1^7*0.9^3 &#x3D; 0.0000000729$, $0.7^7*0.3^3 &#x3D; 0.0022235661$, $0.8^7*0.2^3 &#x3D; 0.0016777216$, 这些值被称为似然值. 显然当正面朝上的概率为0.7时似然值最大, 这也为我们直观上感觉应该是0.7和0.3的感觉提供了理论依据 (王木头学科学).</p>
+<h2 id="交叉熵损失"><a href="#交叉熵损失" class="headerlink" title="交叉熵损失"></a>交叉熵损失</h2>
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Reggie</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://reginald-l.github.io/2022/06/15/%E6%8D%9F%E5%A4%B1%E5%87%BD%E6%95%B0/">https://reginald-l.github.io/2022/06/15/%E6%8D%9F%E5%A4%B1%E5%87%BD%E6%95%B0/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2022 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span><strong>I am a slow walker, but I never walk backwards!!!</strong></span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/Loss-function/"># Loss function</a>
+                    
+                        <a href="/tags/Deep-learning/"># Deep learning</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+            <a class="next" rel="next" href="/2022/05/05/softmax/">softmax</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span> Copyright © Reggie | 2022 </span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>
