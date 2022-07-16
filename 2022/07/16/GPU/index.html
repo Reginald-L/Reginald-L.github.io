@@ -13,7 +13,7 @@
 
 
 
-<title>反向传播和计算图 | Reggie&#39;s blog</title>
+<title>GPU | Reggie&#39;s blog</title>
 
 
 
@@ -221,7 +221,7 @@
     
     <article class="post-wrap">
         <header class="post-header">
-            <h1 class="post-title">反向传播和计算图</h1>
+            <h1 class="post-title">GPU</h1>
             
                 <div class="post-meta">
                     
@@ -230,7 +230,7 @@
 
                     
                         <span class="post-time">
-                        Date: <a href="#">July 9, 2022&nbsp;&nbsp;16:05:50</a>
+                        Date: <a href="#">July 16, 2022&nbsp;&nbsp;17:54:31</a>
                         </span>
                     
                     
@@ -239,38 +239,53 @@
         </header>
 
         <div class="post-content">
-            <h1 id="名词解释"><a href="#名词解释" class="headerlink" title="名词解释"></a>名词解释</h1><table>
+            <h1 id="GPU运算"><a href="#GPU运算" class="headerlink" title="GPU运算"></a>GPU运算</h1><ul>
+<li><p>在PyTorch中，每个数组都有⼀个设备(device), 我们通常将其称为上下⽂(context). </p>
+</li>
+<li><p>默认情况下，所有变量和相关的计算都分配给CPU。有时上下⽂可能是GPU。</p>
+</li>
+<li><p>当我们跨多个服务器部署作业时, 事情会变得更加棘⼿. 通过智能地将数组分配给上下⽂, 我们可以最⼤限度地减少在设备之间传输数据的时间. 例如, 当<br>在带有GPU的服务器上训练神经⽹络时, 我们通常希望模型的参数在GPU上.</p>
+</li>
+</ul>
+<h1 id="计算设备"><a href="#计算设备" class="headerlink" title="计算设备"></a>计算设备</h1><p>我们可以指定⽤于存储和计算的设备, 如CPU和GPU. 默认情况下, 张量是在内存中创建的, 然后使⽤CPU计算它.</p>
+<table>
 <thead>
 <tr>
-<th>术语</th>
-<th>解释</th>
+<th>device</th>
+<th>表示</th>
+<th>注意事项</th>
 </tr>
 </thead>
 <tbody><tr>
-<td>正向传播</td>
-<td>指对神经网络沿着从输入层到输出层的顺序, 依次计算并存储模型的中间变量.</td>
+<td>CPU</td>
+<td>torch.device(‘cpu’)</td>
+<td>cpu设备意味着所有物理CPU和内存, 这意味着PyTorch的计算将尝试使用CPU核心.</td>
 </tr>
 <tr>
-<td>反向传播</td>
-<td>指对神经网络沿着从输出层到输入层的顺序, 依次计算并存储模型的中间变量和参数的梯度.</td>
+<td>GPU</td>
+<td>torch.device(‘cuda’)</td>
+<td>gpu设备只代表一个卡和相应的显存. <br>若有多个GPU, 需要使用torch.device(f’cuda:{i}’)来表示第 i 块(从 0 开始)GPU. 且cuda:0 和cuda是等价的.</td>
 </tr>
 </tbody></table>
-<h1 id="正向传播-forward-propagation"><a href="#正向传播-forward-propagation" class="headerlink" title="正向传播(forward propagation)"></a>正向传播(forward propagation)</h1><img src="/2022/07/09/%E5%8F%8D%E5%90%91%E4%BC%A0%E6%92%AD%E5%92%8C%E8%AE%A1%E7%AE%97%E5%9B%BE/MLP.png" class="" title="例子MLP">
+<p>可以使用 $torch.cuda.device\_count()$ 来查看有多少GPU块可以使用.</p>
+<p>以下代码可以查询设备, 若有GPU可用, 则返回该GPU设备, 否则返回CPU:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># 尝试获取第 i 个GPU</span><br><span class="line">def try_gpu(i=0):</span><br><span class="line">    if torch.cuda.device_count() &gt;= (i + 1):</span><br><span class="line">        return torch.device(f&#x27;cuda:&#123;i&#125;&#x27;)</span><br><span class="line">    return torch.device(&#x27;cpu&#x27;)</span><br><span class="line"></span><br><span class="line">try_gpu()   ==&gt; device(type=&#x27;cuda&#x27;, index=0)</span><br><span class="line">try_gpu(10) ==&gt; device(type=&#x27;cpu&#x27;)</span><br></pre></td></tr></table></figure>
+<p>以下代码可以查找设备中所有可用的GPU块, 若存在则返回, 否则返回CPU:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">def try_all_gpus():</span><br><span class="line">    devices = [torch.device(f&#x27;cuda:&#123;i&#125;&#x27;) for i in range(torch.cuda.device_count())]</span><br><span class="line">    return devices if devices else [torch.device(&#x27;cpu&#x27;)]</span><br><span class="line"></span><br><span class="line">try_all_gpus() ==&gt; [device(type=&#x27;cuda&#x27;, index=0), device(type=&#x27;cuda&#x27;, index=1)]</span><br></pre></td></tr></table></figure>
+<h1 id="张量与GPU"><a href="#张量与GPU" class="headerlink" title="张量与GPU"></a>张量与GPU</h1><h2 id="默认张量创建"><a href="#默认张量创建" class="headerlink" title="默认张量创建"></a>默认张量创建</h2><p>创建张量后可以通过 $device$ 来查看该张量的上下文:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">x = torch.tensor([1, 2, 3])</span><br><span class="line">x.device  ==&gt; device(type=&#x27;cpu&#x27;)</span><br></pre></td></tr></table></figure>
+<h2 id="GPU上创建"><a href="#GPU上创建" class="headerlink" title="GPU上创建"></a>GPU上创建</h2><p>在GPU上创建tensor:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">x = torch.tensor([1, 2, 3], device=try_gpu())</span><br><span class="line">x.device  ==&gt; device(type=&#x27;cuda&#x27;, index=0)</span><br></pre></td></tr></table></figure>
+<h2 id="张量复制"><a href="#张量复制" class="headerlink" title="张量复制"></a>张量复制</h2><p>可以通过 $x.cuda(i)$ 来将张量x从现在的位置复制到指定的GPU块中, 进行计算.</p>
+<p>若两个张量的位置不在同一个GPU块上时, 他们是不能进行计算的. 比如 x 在cpu, y 在gpu 1上, 则x和y是不能相加的.</p>
+<img src="/2022/07/16/GPU/cuda%E5%A4%8D%E5%88%B6.png" class="" title="cuda张量复制">
 
-<p>以上图的感知机为例, 则有:</p>
-<p>$$ z &#x3D; w_1 * X $$<br>$$ h &#x3D; \phi(z) $$<br>$$ O &#x3D; w_2 * h $$<br>损失函数:<br>$$ L &#x3D; l(w,b) $$<br>L2正则:<br>$$ s &#x3D; \frac{\lambda}{2}(||w_1||^2 + ||w_2||^2) $$<br>最终带有正则项的模型损失函数 $J$ 为:<br>$$ J &#x3D; L + s $$</p>
-<h1 id="计算图"><a href="#计算图" class="headerlink" title="计算图"></a>计算图</h1><p>计算图通常被用来可视化运算符和变量在计算过程中的依赖关系.</p>
-<img src="/2022/07/09/%E5%8F%8D%E5%90%91%E4%BC%A0%E6%92%AD%E5%92%8C%E8%AE%A1%E7%AE%97%E5%9B%BE/%E8%AE%A1%E7%AE%97%E5%9B%BE.png" class="" title="正向传播计算图">
-
-<h1 id="反向传播-back-propagation"><a href="#反向传播-back-propagation" class="headerlink" title="反向传播(back propagation)"></a>反向传播(back propagation)</h1><p>神经网络允许损失函数信息通过网络从输出层到输入层反向传递, 以方便计算梯度. </p>
+<p>值得注意的是: 在cpu和gpu之间互换数据是非常耗时的.</p>
+<h1 id="神经网络与GPU"><a href="#神经网络与GPU" class="headerlink" title="神经网络与GPU"></a>神经网络与GPU</h1><p>默认情况下, 模型定义后是在cpu上, 为了提高计算效率, 我们需要将其移动到GPU上.</p>
 <ul>
-<li>我们通常需要的是损失函数关于参数的梯度.</li>
-<li>反向传播是利用微积分中的链式法则进行计算的.</li>
+<li>net.to(device&#x3D;try_gpu()) 该方法可以将模型从cpu移动至指定的GPU块上.<br>值得注意的是输入向量也必须和模型net保持在同一个GPU上.</li>
 </ul>
-<h2 id="递归地使用链式法则实现反向传播"><a href="#递归地使用链式法则实现反向传播" class="headerlink" title="递归地使用链式法则实现反向传播"></a>递归地使用链式法则实现反向传播</h2><img src="/2022/07/09/%E5%8F%8D%E5%90%91%E4%BC%A0%E6%92%AD%E5%92%8C%E8%AE%A1%E7%AE%97%E5%9B%BE/%E9%80%92%E5%BD%92%E5%9C%B0%E5%AE%9E%E7%8E%B0bp.png" class="" title="递归地实现反向传播">
-
-<h2 id="反向传播"><a href="#反向传播" class="headerlink" title="反向传播"></a>反向传播</h2><p>同样滴以上述的MLP为例进行反向传播计算参数梯度:</p>
-<img src="/2022/07/09/%E5%8F%8D%E5%90%91%E4%BC%A0%E6%92%AD%E5%92%8C%E8%AE%A1%E7%AE%97%E5%9B%BE/%E5%8F%8D%E5%90%91%E4%BC%A0%E6%92%AD.png" class="" title="反向传播">
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">net = nn.Sequential(nn.Linear(3, 2))</span><br><span class="line">net.to(device=try_gpu())</span><br><span class="line">net(z.type(torch.float32)) ==&gt; tensor([-0.2525, -0.7090], device=&#x27;cuda:0&#x27;, grad_fn=&lt;AddBackward0&gt;)</span><br><span class="line">net[0].weight.data.device ==&gt; device(type=&#x27;cuda&#x27;, index=0)</span><br></pre></td></tr></table></figure>
         </div>
 
         
@@ -284,7 +299,7 @@
                 
                     <p class="copyright-item">
                         <span>Permalink:</span>
-                        <span><a href="https://reginald-l.github.io/2022/07/09/%E5%8F%8D%E5%90%91%E4%BC%A0%E6%92%AD%E5%92%8C%E8%AE%A1%E7%AE%97%E5%9B%BE/">https://reginald-l.github.io/2022/07/09/%E5%8F%8D%E5%90%91%E4%BC%A0%E6%92%AD%E5%92%8C%E8%AE%A1%E7%AE%97%E5%9B%BE/</a></span>
+                        <span><a href="https://reginald-l.github.io/2022/07/16/GPU/">https://reginald-l.github.io/2022/07/16/GPU/</a></span>
                     </p>
                 
                 
@@ -308,13 +323,9 @@
                 <span class="tag">
                     
                     
-                        <a href="/tags/deep-learning/"># deep learning</a>
+                        <a href="/tags/Pytorch/"># Pytorch</a>
                     
-                        <a href="/tags/machine-learning/"># machine learning</a>
-                    
-                        <a href="/tags/back-propagation/"># back propagation</a>
-                    
-                        <a href="/tags/computational-graph/"># computational graph</a>
+                        <a href="/tags/GPU%E8%BF%90%E7%AE%97/"># GPU运算</a>
                     
                         
                 </span>
@@ -327,10 +338,8 @@
         </section>
         <section class="post-nav">
             
-                <a class="prev" rel="prev" href="/2022/07/16/Pytorch%E6%A8%A1%E5%9E%8B%E5%AE%9A%E4%B9%89%E5%92%8C%E5%8F%82%E6%95%B0%E8%AE%BF%E9%97%AE/">Pytorch模型定义和参数访问</a>
             
-            
-            <a class="next" rel="next" href="/2022/07/08/%E4%B8%A2%E5%BC%83%E6%B3%95/">丢弃法</a>
+            <a class="next" rel="next" href="/2022/07/16/%E4%BF%9D%E5%AD%98%E5%92%8C%E5%8A%A0%E8%BD%BD/">保存和加载</a>
             
         </section>
 

@@ -13,7 +13,7 @@
 
 
 
-<title>反向传播和计算图 | Reggie&#39;s blog</title>
+<title>保存和加载 | Reggie&#39;s blog</title>
 
 
 
@@ -221,7 +221,7 @@
     
     <article class="post-wrap">
         <header class="post-header">
-            <h1 class="post-title">反向传播和计算图</h1>
+            <h1 class="post-title">保存和加载</h1>
             
                 <div class="post-meta">
                     
@@ -230,7 +230,7 @@
 
                     
                         <span class="post-time">
-                        Date: <a href="#">July 9, 2022&nbsp;&nbsp;16:05:50</a>
+                        Date: <a href="#">July 16, 2022&nbsp;&nbsp;13:01:31</a>
                         </span>
                     
                     
@@ -239,38 +239,26 @@
         </header>
 
         <div class="post-content">
-            <h1 id="名词解释"><a href="#名词解释" class="headerlink" title="名词解释"></a>名词解释</h1><table>
-<thead>
-<tr>
-<th>术语</th>
-<th>解释</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>正向传播</td>
-<td>指对神经网络沿着从输入层到输出层的顺序, 依次计算并存储模型的中间变量.</td>
-</tr>
-<tr>
-<td>反向传播</td>
-<td>指对神经网络沿着从输出层到输入层的顺序, 依次计算并存储模型的中间变量和参数的梯度.</td>
-</tr>
-</tbody></table>
-<h1 id="正向传播-forward-propagation"><a href="#正向传播-forward-propagation" class="headerlink" title="正向传播(forward propagation)"></a>正向传播(forward propagation)</h1><img src="/2022/07/09/%E5%8F%8D%E5%90%91%E4%BC%A0%E6%92%AD%E5%92%8C%E8%AE%A1%E7%AE%97%E5%9B%BE/MLP.png" class="" title="例子MLP">
-
-<p>以上图的感知机为例, 则有:</p>
-<p>$$ z &#x3D; w_1 * X $$<br>$$ h &#x3D; \phi(z) $$<br>$$ O &#x3D; w_2 * h $$<br>损失函数:<br>$$ L &#x3D; l(w,b) $$<br>L2正则:<br>$$ s &#x3D; \frac{\lambda}{2}(||w_1||^2 + ||w_2||^2) $$<br>最终带有正则项的模型损失函数 $J$ 为:<br>$$ J &#x3D; L + s $$</p>
-<h1 id="计算图"><a href="#计算图" class="headerlink" title="计算图"></a>计算图</h1><p>计算图通常被用来可视化运算符和变量在计算过程中的依赖关系.</p>
-<img src="/2022/07/09/%E5%8F%8D%E5%90%91%E4%BC%A0%E6%92%AD%E5%92%8C%E8%AE%A1%E7%AE%97%E5%9B%BE/%E8%AE%A1%E7%AE%97%E5%9B%BE.png" class="" title="正向传播计算图">
-
-<h1 id="反向传播-back-propagation"><a href="#反向传播-back-propagation" class="headerlink" title="反向传播(back propagation)"></a>反向传播(back propagation)</h1><p>神经网络允许损失函数信息通过网络从输出层到输入层反向传递, 以方便计算梯度. </p>
-<ul>
-<li>我们通常需要的是损失函数关于参数的梯度.</li>
-<li>反向传播是利用微积分中的链式法则进行计算的.</li>
+            <h1 id="存储和加载参数和模型"><a href="#存储和加载参数和模型" class="headerlink" title="存储和加载参数和模型"></a>存储和加载参数和模型</h1><p>有的时候我们需要对参数和模型进行保存, 以备在不同的环境中使用, 比如在模型部署时.</p>
+<p>此外, 当我们运行一个耗时的训练过程时, 最好定期将中间结果进行保存, 以确保服务器突然中断时, 不会损失这几天的计算结果.</p>
+<h1 id="保存和加载张量"><a href="#保存和加载张量" class="headerlink" title="保存和加载张量"></a>保存和加载张量</h1><ul>
+<li>torch.save(张量, ‘x_file’) 保存</li>
+<li>torch.load(‘x_file’) 加载<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">X = torch.arange(4)</span><br><span class="line">torch.save(X, &#x27;x_file&#x27;) # 保存张量X</span><br><span class="line">X1 = torch.load(&#x27;x_file&#x27;) # 加载张量X</span><br></pre></td></tr></table></figure></li>
 </ul>
-<h2 id="递归地使用链式法则实现反向传播"><a href="#递归地使用链式法则实现反向传播" class="headerlink" title="递归地使用链式法则实现反向传播"></a>递归地使用链式法则实现反向传播</h2><img src="/2022/07/09/%E5%8F%8D%E5%90%91%E4%BC%A0%E6%92%AD%E5%92%8C%E8%AE%A1%E7%AE%97%E5%9B%BE/%E9%80%92%E5%BD%92%E5%9C%B0%E5%AE%9E%E7%8E%B0bp.png" class="" title="递归地实现反向传播">
+<h1 id="保存和加载张量列表"><a href="#保存和加载张量列表" class="headerlink" title="保存和加载张量列表"></a>保存和加载张量列表</h1><ul>
+<li>torch.save([张量1, 张量2], ‘x_files’) 保存</li>
+<li>torch.load(‘x_files’) 加载<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">y = torch.zeros(4)</span><br><span class="line">torch.save([X, y], &#x27;x_files&#x27;)</span><br><span class="line">x1, y1 = torch.load(&#x27;x_files&#x27;)</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h1 id="保存一个字典"><a href="#保存一个字典" class="headerlink" title="保存一个字典"></a>保存一个字典</h1><ul>
+<li>torch.save(dict, ‘mydict’) 保存</li>
+<li>torch.load(‘mydict’) 加载<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">my_dict = &#123;&#x27;x&#x27;: X, &#x27;y&#x27;: y&#125;</span><br><span class="line">torch.save(my_dict, &#x27;mydict&#x27;)</span><br><span class="line">dict1 = torch.load(&#x27;mydict&#x27;)</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h1 id="加载和保存模型参数"><a href="#加载和保存模型参数" class="headerlink" title="加载和保存模型参数"></a>加载和保存模型参数</h1><ul>
+<li>torch.save(net.state_dict(), ‘mlp_params’)</li>
+<li>加载时需要从新定义原模型, 并使用clone.load_state_dict和torch.load加载模型参数<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">class MLP(nn.Module):</span><br><span class="line">    def __init__(self):</span><br><span class="line">        super().__init__()</span><br><span class="line">        self.hidden = nn.Linear(20, 256)</span><br><span class="line">        self.output = nn.Linear(256, 10)</span><br><span class="line">    </span><br><span class="line">    def forward(self, X):</span><br><span class="line">            return self.output(nn.functional.relu(self.hidden(X)))</span><br><span class="line"></span><br><span class="line">net = MLP()</span><br><span class="line">X = torch.randn(size=(2, 20))</span><br><span class="line">y = net(X)</span><br><span class="line"># 保存模型参数</span><br><span class="line">torch.save(net.state_dict(), &#x27;mlp_params&#x27;)</span><br></pre></td></tr></table></figure>
+读取参数:<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">clone = MLP()</span><br><span class="line">clone.load_state_dict(torch.load(&quot;mlp_params&quot;))</span><br><span class="line">clone.eval()</span><br><span class="line"></span><br><span class="line">y_clone = clone(X)</span><br><span class="line">y_clone == y  &gt;&gt;&gt;&gt; [True, True, ...]</span><br></pre></td></tr></table></figure></li>
+</ul>
 
-<h2 id="反向传播"><a href="#反向传播" class="headerlink" title="反向传播"></a>反向传播</h2><p>同样滴以上述的MLP为例进行反向传播计算参数梯度:</p>
-<img src="/2022/07/09/%E5%8F%8D%E5%90%91%E4%BC%A0%E6%92%AD%E5%92%8C%E8%AE%A1%E7%AE%97%E5%9B%BE/%E5%8F%8D%E5%90%91%E4%BC%A0%E6%92%AD.png" class="" title="反向传播">
         </div>
 
         
@@ -284,7 +272,7 @@
                 
                     <p class="copyright-item">
                         <span>Permalink:</span>
-                        <span><a href="https://reginald-l.github.io/2022/07/09/%E5%8F%8D%E5%90%91%E4%BC%A0%E6%92%AD%E5%92%8C%E8%AE%A1%E7%AE%97%E5%9B%BE/">https://reginald-l.github.io/2022/07/09/%E5%8F%8D%E5%90%91%E4%BC%A0%E6%92%AD%E5%92%8C%E8%AE%A1%E7%AE%97%E5%9B%BE/</a></span>
+                        <span><a href="https://reginald-l.github.io/2022/07/16/%E4%BF%9D%E5%AD%98%E5%92%8C%E5%8A%A0%E8%BD%BD/">https://reginald-l.github.io/2022/07/16/%E4%BF%9D%E5%AD%98%E5%92%8C%E5%8A%A0%E8%BD%BD/</a></span>
                     </p>
                 
                 
@@ -308,13 +296,15 @@
                 <span class="tag">
                     
                     
-                        <a href="/tags/deep-learning/"># deep learning</a>
+                        <a href="/tags/Pytorch/"># Pytorch</a>
                     
-                        <a href="/tags/machine-learning/"># machine learning</a>
+                        <a href="/tags/%E5%8F%82%E6%95%B0%E4%BF%9D%E5%AD%98/"># 参数保存</a>
                     
-                        <a href="/tags/back-propagation/"># back propagation</a>
+                        <a href="/tags/%E5%8F%82%E6%95%B0%E5%8A%A0%E8%BD%BD/"># 参数加载</a>
                     
-                        <a href="/tags/computational-graph/"># computational graph</a>
+                        <a href="/tags/%E6%A8%A1%E5%9E%8B%E4%BF%9D%E5%AD%98/"># 模型保存</a>
+                    
+                        <a href="/tags/%E6%A8%A1%E5%9E%8B%E5%8A%A0%E8%BD%BD/"># 模型加载</a>
                     
                         
                 </span>
@@ -327,10 +317,10 @@
         </section>
         <section class="post-nav">
             
-                <a class="prev" rel="prev" href="/2022/07/16/Pytorch%E6%A8%A1%E5%9E%8B%E5%AE%9A%E4%B9%89%E5%92%8C%E5%8F%82%E6%95%B0%E8%AE%BF%E9%97%AE/">Pytorch模型定义和参数访问</a>
+                <a class="prev" rel="prev" href="/2022/07/16/GPU/">GPU</a>
             
             
-            <a class="next" rel="next" href="/2022/07/08/%E4%B8%A2%E5%BC%83%E6%B3%95/">丢弃法</a>
+            <a class="next" rel="next" href="/2022/07/16/Pytorch%E6%A8%A1%E5%9E%8B%E5%AE%9A%E4%B9%89%E5%92%8C%E5%8F%82%E6%95%B0%E8%AE%BF%E9%97%AE/">Pytorch模型定义和参数访问</a>
             
         </section>
 
