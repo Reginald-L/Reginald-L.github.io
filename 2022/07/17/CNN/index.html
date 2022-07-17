@@ -13,7 +13,7 @@
 
 
 
-<title>GPU | Reggie&#39;s blog</title>
+<title>CNN | Reggie&#39;s blog</title>
 
 
 
@@ -221,7 +221,7 @@
     
     <article class="post-wrap">
         <header class="post-header">
-            <h1 class="post-title">GPU</h1>
+            <h1 class="post-title">CNN</h1>
             
                 <div class="post-meta">
                     
@@ -230,7 +230,7 @@
 
                     
                         <span class="post-time">
-                        Date: <a href="#">July 16, 2022&nbsp;&nbsp;17:54:31</a>
+                        Date: <a href="#">July 17, 2022&nbsp;&nbsp;12:04:04</a>
                         </span>
                     
                     
@@ -239,53 +239,40 @@
         </header>
 
         <div class="post-content">
-            <h1 id="GPU运算"><a href="#GPU运算" class="headerlink" title="GPU运算"></a>GPU运算</h1><ul>
-<li><p>在PyTorch中，每个数组都有⼀个设备(device), 我们通常将其称为上下⽂(context). </p>
-</li>
-<li><p>默认情况下，所有变量和相关的计算都分配给CPU。有时上下⽂可能是GPU。</p>
-</li>
-<li><p>当我们跨多个服务器部署作业时, 事情会变得更加棘⼿. 通过智能地将数组分配给上下⽂, 我们可以最⼤限度地减少在设备之间传输数据的时间. 例如, 当<br>在带有GPU的服务器上训练神经⽹络时, 我们通常希望模型的参数在GPU上.</p>
-</li>
-</ul>
-<h1 id="计算设备"><a href="#计算设备" class="headerlink" title="计算设备"></a>计算设备</h1><p>我们可以指定⽤于存储和计算的设备, 如CPU和GPU. 默认情况下, 张量是在内存中创建的, 然后使⽤CPU计算它.</p>
-<table>
-<thead>
-<tr>
-<th>device</th>
-<th>表示</th>
-<th>注意事项</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>CPU</td>
-<td>torch.device(‘cpu’)</td>
-<td>cpu设备意味着所有物理CPU和内存, 这意味着PyTorch的计算将尝试使用CPU核心.</td>
-</tr>
-<tr>
-<td>GPU</td>
-<td>torch.device(‘cuda’)</td>
-<td>gpu设备只代表一个卡和相应的显存. <br>若有多个GPU, 需要使用torch.device(f’cuda:{i}’)来表示第 i 块(从 0 开始)GPU. 且cuda:0 和cuda是等价的.</td>
-</tr>
-</tbody></table>
-<p>可以使用 $torch.cuda.device\_count()$ 来查看有多少GPU块可以使用.</p>
-<p>以下代码可以查询设备, 若有GPU可用, 则返回该GPU设备, 否则返回CPU:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># 尝试获取第 i 个GPU</span><br><span class="line">def try_gpu(i=0):</span><br><span class="line">    if torch.cuda.device_count() &gt;= (i + 1):</span><br><span class="line">        return torch.device(f&#x27;cuda:&#123;i&#125;&#x27;)</span><br><span class="line">    return torch.device(&#x27;cpu&#x27;)</span><br><span class="line"></span><br><span class="line">try_gpu()   ==&gt; device(type=&#x27;cuda&#x27;, index=0)</span><br><span class="line">try_gpu(10) ==&gt; device(type=&#x27;cpu&#x27;)</span><br></pre></td></tr></table></figure>
-<p>以下代码可以查找设备中所有可用的GPU块, 若存在则返回, 否则返回CPU:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">def try_all_gpus():</span><br><span class="line">    devices = [torch.device(f&#x27;cuda:&#123;i&#125;&#x27;) for i in range(torch.cuda.device_count())]</span><br><span class="line">    return devices if devices else [torch.device(&#x27;cpu&#x27;)]</span><br><span class="line"></span><br><span class="line">try_all_gpus() ==&gt; [device(type=&#x27;cuda&#x27;, index=0), device(type=&#x27;cuda&#x27;, index=1)]</span><br></pre></td></tr></table></figure>
-<h1 id="张量与GPU"><a href="#张量与GPU" class="headerlink" title="张量与GPU"></a>张量与GPU</h1><h2 id="默认张量创建"><a href="#默认张量创建" class="headerlink" title="默认张量创建"></a>默认张量创建</h2><p>创建张量后可以通过 $device$ 来查看该张量的上下文:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">x = torch.tensor([1, 2, 3])</span><br><span class="line">x.device  ==&gt; device(type=&#x27;cpu&#x27;)</span><br></pre></td></tr></table></figure>
-<h2 id="GPU上创建"><a href="#GPU上创建" class="headerlink" title="GPU上创建"></a>GPU上创建</h2><p>在GPU上创建tensor:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">x = torch.tensor([1, 2, 3], device=try_gpu())</span><br><span class="line">x.device  ==&gt; device(type=&#x27;cuda&#x27;, index=0)</span><br></pre></td></tr></table></figure>
-<h2 id="张量复制"><a href="#张量复制" class="headerlink" title="张量复制"></a>张量复制</h2><p>可以通过 $x.cuda(i)$ 来将张量x从现在的位置复制到指定的GPU块中, 进行计算.</p>
-<p>若两个张量的位置不在同一个GPU块上时, 他们是不能进行计算的. 比如 x 在cpu, y 在gpu 1上, 则x和y是不能相加的.</p>
-<img src="/2022/07/16/GPU/cuda%E5%A4%8D%E5%88%B6.png" class="" title="cuda张量复制">
+            <h1 id="交叉相关运算"><a href="#交叉相关运算" class="headerlink" title="交叉相关运算"></a>交叉相关运算</h1><h2 id="理论"><a href="#理论" class="headerlink" title="理论"></a>理论</h2><p>cross-correlation, 也称为互相关运算.</p>
+<img src="/2022/07/17/CNN/%E4%BA%92%E7%9B%B8%E5%85%B3%E8%BF%90%E7%AE%97.png" class="" title="互相关运算">
 
-<p>值得注意的是: 在cpu和gpu之间互换数据是非常耗时的.</p>
-<h1 id="神经网络与GPU"><a href="#神经网络与GPU" class="headerlink" title="神经网络与GPU"></a>神经网络与GPU</h1><p>默认情况下, 模型定义后是在cpu上, 为了提高计算效率, 我们需要将其移动到GPU上.</p>
+<blockquote>
+<p>输出大小略小于输入大小. 因为卷积核的宽和高都大于1, 而卷积核只和图像中每个大小完全适合的位置进行互相关运算. 所以输出矩阵的大小为输入矩阵大小 $n_h * n_w$ 减去 卷积核大小 $k_h * k_w$, 即 $ Y &#x3D; (n_h - k_h + 1, n_w - k_w + 1) $</p>
+</blockquote>
 <ul>
-<li>net.to(device&#x3D;try_gpu()) 该方法可以将模型从cpu移动至指定的GPU块上.<br>值得注意的是输入向量也必须和模型net保持在同一个GPU上.</li>
+<li>核矩阵和偏移是可学习的参数</li>
+<li>核矩阵的大小是超参数</li>
 </ul>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">net = nn.Sequential(nn.Linear(3, 2))</span><br><span class="line">net.to(device=try_gpu())</span><br><span class="line">net(z.type(torch.float32)) ==&gt; tensor([-0.2525, -0.7090], device=&#x27;cuda:0&#x27;, grad_fn=&lt;AddBackward0&gt;)</span><br><span class="line">net[0].weight.data.device ==&gt; device(type=&#x27;cuda&#x27;, index=0)</span><br></pre></td></tr></table></figure>
+<h2 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">def cross_correlation(X, k):</span><br><span class="line">    # X为输入矩阵, k为核矩阵</span><br><span class="line">    h, w = k.shape</span><br><span class="line">    Y = torch.zeros(size=(X.shape[0] - h + 1, X.shape[1] - w + 1))</span><br><span class="line">    for i in range(Y.shape[0]):</span><br><span class="line">        for j in range(Y.shape[1]):</span><br><span class="line">            Y[i , j] = (X[i : i+h, j : j+w] * k).sum()</span><br><span class="line">    return Y</span><br></pre></td></tr></table></figure>
+
+<h1 id="二维卷积层"><a href="#二维卷积层" class="headerlink" title="二维卷积层"></a>二维卷积层</h1><p>和MLP类似, 只不过MLP中我们的输入, 参数, 输出都是一个向量. 但是卷积层中我们的运算对象则是矩阵.</p>
+<h2 id="代码实现-1"><a href="#代码实现-1" class="headerlink" title="代码实现"></a>代码实现</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">class Conv2D(torch.nn.Module):</span><br><span class="line">    def __init__(self, kernel_size):</span><br><span class="line">        super().__init__()</span><br><span class="line">        self.weight = torch.nn.Parameter(torch.rand(kernel_size))</span><br><span class="line">        self.bias = torch.nn.Parameter(torch.zeros(1))</span><br><span class="line">        </span><br><span class="line">    def forward(self, X):</span><br><span class="line">        return cross_correlation(X, self.weight) + self.bias</span><br></pre></td></tr></table></figure>
+
+<h1 id="根据输入X和输出Y学习卷积核"><a href="#根据输入X和输出Y学习卷积核" class="headerlink" title="根据输入X和输出Y学习卷积核"></a>根据输入X和输出Y学习卷积核</h1><ol>
+<li>定义一个二维卷积层<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">conv2d = torch.nn.Conv2d(1, 1, kernel_size=(1, 2), bias=False)</span><br></pre></td></tr></table></figure></li>
+<li>定义输入X, 输出Y以及学习率 lr<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">X = X.reshape((1, 1, 10, 10))</span><br><span class="line">Y = Y.reshape((1, 1, 10, 9))</span><br><span class="line">lr = 0.003</span><br></pre></td></tr></table></figure></li>
+<li>训练模型<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">for i in range(10):</span><br><span class="line">    Y_hat = conv2d(X)</span><br><span class="line">    l = (Y_hat - Y) ** 2 / 2 </span><br><span class="line">    conv2d.zero_grad()</span><br><span class="line">    l.sum().backward()</span><br><span class="line">    conv2d.weight.data[:] -= lr * conv2d.weight.grad</span><br><span class="line">    if (i + 1) % 2 == 0:</span><br><span class="line">        print(f&#x27;epoch &#123;i+1&#125;, loss &#123;l.sum():.3f&#125;&#x27;)</span><br><span class="line"></span><br><span class="line"># 查看参数核的值</span><br><span class="line">conv2d.weight.data.reshape(1, 2) ==&gt; tensor([[-0.9547,  0.9314]])</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h1 id="填充"><a href="#填充" class="headerlink" title="填充"></a>填充</h1><blockquote>
+<p>正如前面提到的, 卷积运算之后的输出形状是 $(n_h - k_h + 1, n_w - k_w + 1)$ 可见输出形状会受到输入矩阵的形状和核矩阵形状的影响. 且由于核的宽和高通常都大于 1, 所以随着一连串的卷积运算之后, 输出的形状会远远小于输入形状. 如此一来会丢失许多重要的边界信息. 解决之个问题我们需要借助填充.</p>
+</blockquote>
+<p>所谓填充就是在原始的输入矩阵外围填充(padding): 在输⼊图像的边界填充元素（通常填充元素是0), 如下图所示:</p>
+<img src="/2022/07/17/CNN/%E5%A1%AB%E5%85%85.png" class="" title="填充输入矩阵">
+<p>填充后的卷积运算如下:</p>
+<img src="/2022/07/17/CNN/%E5%A1%AB%E5%85%85%E5%90%8E%E7%9A%84%E5%8D%B7%E7%A7%AF%E8%BF%90%E7%AE%97.png" class="" title="填充后的卷积运算">
+
+<p>通常, 如果我们添加 $p_h$ ⾏填充(⼤约⼀半在顶部, ⼀半在底部)和 $p_w$ 列填充(左侧⼤约⼀半, 右侧⼀半), 则输出形状将为:<br>$$ (n_h - k_h + p_h + 1, n_w - k_w + p_w + 1) $$</p>
+<ul>
+<li>在许多情况下, 我们需要设置ph &#x3D; kh − 1和pw &#x3D; kw − 1, 使输⼊和输出具有相同的⾼度和宽度.</li>
+<li>卷积神经⽹络中卷积核的⾼度和宽度通常为奇数, 例如1, 3, 5或7.</li>
+</ul>
+
         </div>
 
         
@@ -299,7 +286,7 @@
                 
                     <p class="copyright-item">
                         <span>Permalink:</span>
-                        <span><a href="https://reginald-l.github.io/2022/07/16/GPU/">https://reginald-l.github.io/2022/07/16/GPU/</a></span>
+                        <span><a href="https://reginald-l.github.io/2022/07/17/CNN/">https://reginald-l.github.io/2022/07/17/CNN/</a></span>
                     </p>
                 
                 
@@ -323,9 +310,7 @@
                 <span class="tag">
                     
                     
-                        <a href="/tags/Pytorch/"># Pytorch</a>
-                    
-                        <a href="/tags/GPU%E8%BF%90%E7%AE%97/"># GPU运算</a>
+                        <a href="/tags/%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/"># 卷积神经网络</a>
                     
                         
                 </span>
@@ -338,10 +323,8 @@
         </section>
         <section class="post-nav">
             
-                <a class="prev" rel="prev" href="/2022/07/17/CNN/">CNN</a>
             
-            
-            <a class="next" rel="next" href="/2022/07/16/%E4%BF%9D%E5%AD%98%E5%92%8C%E5%8A%A0%E8%BD%BD/">保存和加载</a>
+            <a class="next" rel="next" href="/2022/07/16/GPU/">GPU</a>
             
         </section>
 
