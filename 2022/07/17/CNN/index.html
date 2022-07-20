@@ -239,7 +239,18 @@
         </header>
 
         <div class="post-content">
-            <h1 id="交叉相关运算"><a href="#交叉相关运算" class="headerlink" title="交叉相关运算"></a>交叉相关运算</h1><h2 id="理论"><a href="#理论" class="headerlink" title="理论"></a>理论</h2><p>cross-correlation, 也称为互相关运算.</p>
+            <h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ul>
+<li>核大小, 填充, 步幅是卷积神经中的超参数</li>
+<li>核大小通常取奇数, 比如 1, 3, 5 和 7</li>
+<li>填充的作用通常是使得输出和输入的形状保持一致</li>
+<li>步幅的作用是让输出的形状呈指数降低, 当不设置步幅时, 输出形状与输入和核形状是线性相关的, 即呈线性下降</li>
+<li>填充通常是取 k - 1</li>
+<li>步幅通常取1, 但是当计算量较大时, 或者有别的需求时往往取2</li>
+</ul>
+<blockquote>
+<p>二维卷积层:<br>输入X: $(c_i, n_h, n_w)$<br>核W: $(c_o, c_i, k_h, k_w)$<br>偏差B: $(c_o, c_i)$<br>输出 Y: $(c_o, m_h, m_w)$<br>计算复杂度: $O(c_ic_ok_hk_wm_hm_w)$</p>
+</blockquote>
+<h1 id="交叉相关运算"><a href="#交叉相关运算" class="headerlink" title="交叉相关运算"></a>交叉相关运算</h1><h2 id="理论"><a href="#理论" class="headerlink" title="理论"></a>理论</h2><p>cross-correlation, 也称为互相关运算.</p>
 <img src="/2022/07/17/CNN/%E4%BA%92%E7%9B%B8%E5%85%B3%E8%BF%90%E7%AE%97.png" class="" title="互相关运算">
 
 <blockquote>
@@ -274,8 +285,30 @@
 </ul>
 <h1 id="步幅-stride"><a href="#步幅-stride" class="headerlink" title="步幅 stride"></a>步幅 stride</h1><p>步幅是另外一种影响输出形状的因素, 他是指在交叉运算过程中, 核窗口从左到右, 从上到下过程中每次划过的行和列称为步幅(stride).</p>
 <blockquote>
-<p>假如给定的高度步幅 $s_h$ 和 宽度步幅 $s_w$, 则输出形状是: $$ [(n_h - k_h + p_h + s_h) &#x2F; s_h, (n_w - k_w + p_w + s_w) &#x2F; s_w] $$</p>
+<p>假如给定的高度步幅 $s_h$ 和 宽度步幅 $s_w$, 则输出形状是: $$ (\frac{n_h - k_h + p_h + s_h}{s_h}, \frac{n_w - k_w + p_w + s_w}{s_w}) $$<br>若输入的宽度和高度度可以被步幅整除, 则输出形状为: $$ (\frac{n_h}{s_h}, \frac{n_w}{s_w}) $$</p>
 </blockquote>
+<ul>
+<li>通常步幅取 2.</li>
+</ul>
+<h1 id="多输入和输出通道CNN"><a href="#多输入和输出通道CNN" class="headerlink" title="多输入和输出通道CNN"></a>多输入和输出通道CNN</h1><ul>
+<li>彩色图像可能有RGB三个通道</li>
+<li>转换为灰度会丢失信息</li>
+</ul>
+<h2 id="多个输入通道"><a href="#多个输入通道" class="headerlink" title="多个输入通道"></a>多个输入通道</h2><blockquote>
+<p>每个通道都有一个卷积核, 结果是所有通道卷积结果的和.<br>加入输入通道后, 输入就从原先的二维 $(n_h, n_w)$ 转为 三维 $(c_i, n_h, n_w)$. <br>同理核也从原先的二维 $(k_h, k_w)$ 转为 三维 $(c_i, k_h, k_w)$ <br>而输出由于最后将所有通道的结果进行了相加, 其结果形状依然是保持二维.</p>
+</blockquote>
+<img src="/2022/07/17/CNN/%E5%A4%9A%E9%80%9A%E9%81%93%E8%BE%93%E5%85%A5CNN.png" class="" title="多输入通道CNN">
+<p>可以看出, 多输入通道的计算过程分为两个阶段:</p>
+<ol>
+<li>分别按照交叉运算计算每个通道的结果值;</li>
+<li>将所有通道对应的结果进行相加得到最后的输出结果.<br>例如上图中的56: $$ (1 × 1 + 2 × 2 + 4 × 3 + 5 × 4) + (0 × 0 + 1 × 1 + 3 × 2 + 4 × 3) &#x3D; 56 $$</li>
+</ol>
+<h2 id="多个输出通道"><a href="#多个输出通道" class="headerlink" title="多个输出通道"></a>多个输出通道</h2><blockquote>
+<p>通多上述对多个输入通道的计算过程的了解, 我们可以知道, 不管有多少个输入通道, 最后我们只能得到一个输出通道.<br>每个输出通道都是识别特定的模式</p>
+</blockquote>
+<p>为了使得我们的输出通道也成为多个, 我们需要有多个三维卷积核, 即 $(c_o, c_i, k_h, k_w)$. 其中 $c_o$ 表示输出通道, 即有几组 $(c_i, k_h, k_w)$ 这样的核窗口.</p>
+<p>对于每一个输出通道, 我们都会使用整个输入 $X: (c_i, n_h, n_w)$ 和第 $i$ 个核窗口做交叉运算, 得到第 $i$ 个输出 $(m_h, m_w)$, 最后将所有的输出进行concat.</p>
+<img src="/2022/07/17/CNN/%E5%A4%9A%E8%BE%93%E5%87%BA%E9%80%9A%E9%81%93CNN.png" class="" title="多输出通道CNN">
 
         </div>
 
