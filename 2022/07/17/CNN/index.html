@@ -239,7 +239,14 @@
         </header>
 
         <div class="post-content">
-            <h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ul>
+            <h1 id="CNN-整体架构"><a href="#CNN-整体架构" class="headerlink" title="CNN 整体架构"></a>CNN 整体架构</h1><img src="/2022/07/17/CNN/wholeCNN.png" class="" title="整体CNN架构">
+
+<ul>
+<li>Pooling层并不是必须的, 它是为了减轻计算开销而进行的, 风靡一时的Alpha GO中就没有使用Pooling层, 是一个全卷积层的CNN架构.</li>
+<li>可想而知, Pooling层会按照一定的规则去掉某些列或者行, 如果下围棋时去掉一行或者一列整个战局就发生了变化, 所以Alpha GO中并没有使用Pooling.</li>
+</ul>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ul>
+<li>Convolutional Neural Network (CNN)</li>
 <li>核大小, 填充, 步幅是卷积神经中的超参数</li>
 <li>核大小通常取奇数, 比如 1, 3, 5 和 7</li>
 <li>填充的作用通常是使得输出和输入的形状保持一致</li>
@@ -250,6 +257,21 @@
 <blockquote>
 <p>二维卷积层:<br>输入X: $(c_i, n_h, n_w)$<br>核W: $(c_o, c_i, k_h, k_w)$<br>偏差B: $(c_o, c_i)$<br>输出 Y: $(c_o, m_h, m_w)$<br>计算复杂度: $O(c_ic_ok_hk_wm_hm_w)$</p>
 </blockquote>
+<h1 id="与CNN有关的一些术语"><a href="#与CNN有关的一些术语" class="headerlink" title="与CNN有关的一些术语"></a>与CNN有关的一些术语</h1><h2 id="Receptive-Field-感受野"><a href="#Receptive-Field-感受野" class="headerlink" title="Receptive Field (感受野)"></a>Receptive Field (感受野)</h2><p>感受野是表示当前feature map中每一个元素与原图中对应的元素大小. 换言之, 当前层中这个元素往回走能投影到原图中的像素范围.</p>
+<img src="/2022/07/17/CNN/receptive_field.png" class="" title="感受野">
+<blockquote>
+<p>以上图为例, 我们在经过一次卷积后, 我们得到一个feature map, 在这个神经元中, 每一个像素都是有原图像中的 $(3 * 3)$ 的像素计算出来的, 所以一个 $(5 * 5)$ 的图像经过 $(3 * 3)$ 的核窗口后, 其感受野的大小为 $(3 * 3)$; 随着继续卷积运算, 我们得到一个 $(1 * 1)$ 的feature map, 此时的这个神经元覆盖了原图像中的所有元素, 所以此时它的感受野是 $(5 * 5)$.</p>
+</blockquote>
+<p>常见的Receptive Field的设置通常是 $(通道数, kernel_size)$, 如下图:</p>
+<img src="/2022/07/17/CNN/receptive_value.png" class="" title="感受野的取值">
+
+<ul>
+<li>一般感受野步幅会被设置到允许两个感受野少量重叠, 避免一些重要的特征出现在他们之间而被忽略.</li>
+</ul>
+<h2 id="Feature-map"><a href="#Feature-map" class="headerlink" title="Feature map"></a>Feature map</h2><p>Feature map是指当输入张量与核窗口(过滤器)进行交叉运算后, 得到的结果张量.</p>
+<h2 id="Kernel"><a href="#Kernel" class="headerlink" title="Kernel"></a>Kernel</h2><p>Kernel也称为filter 过滤器, 即所谓的Convolutional Layer就是使用一组filter在图片中抓取某一个特定的Pattern, 至于具体到每一个filter的识别目标是由模型自己学习得出的. Filter扫过一次图像后, 会得到一个Feature map, 在所对应的feature map中找到最大那个值就是该filter所要识别的pattern.</p>
+<img src="/2022/07/17/CNN/Filter.png" class="" title="Filter">
+
 <h1 id="交叉相关运算"><a href="#交叉相关运算" class="headerlink" title="交叉相关运算"></a>交叉相关运算</h1><h2 id="理论"><a href="#理论" class="headerlink" title="理论"></a>理论</h2><p>cross-correlation, 也称为互相关运算.</p>
 <img src="/2022/07/17/CNN/%E4%BA%92%E7%9B%B8%E5%85%B3%E8%BF%90%E7%AE%97.png" class="" title="互相关运算">
 
@@ -359,6 +381,8 @@
             </div>
         </section>
         <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2022/07/20/CNN-%E6%B1%A0%E5%8C%96%E5%B1%82/">CNN-池化层</a>
             
             
             <a class="next" rel="next" href="/2022/07/16/GPU/">GPU</a>
