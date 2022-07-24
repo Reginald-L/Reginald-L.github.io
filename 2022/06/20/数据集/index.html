@@ -240,9 +240,15 @@
 
         <div class="post-content">
             <h2 id="常见数据集"><a href="#常见数据集" class="headerlink" title="常见数据集"></a>常见数据集</h2><ul>
+<li>MNIST</li>
 <li>FashionMNIST</li>
 </ul>
-<h2 id="FashionMNIST"><a href="#FashionMNIST" class="headerlink" title="FashionMNIST"></a>FashionMNIST</h2><h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p>FashionMNIST数据集包含了10种类别的共7万个商品的图片. 其中6万个用作训练集, 1万个用作测试集. 每一张图片都是 $ 1<em>28</em>28 $ 的灰度图片. 官方描述如下:</p>
+<h2 id="MNIST"><a href="#MNIST" class="headerlink" title="MNIST"></a>MNIST</h2><h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p>MNIST是一个手写数字数据集, 包含了 50000 个训练数据和10000个测试数据. 每一张图片都是 $1<em>28</em>28$, 一共有 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 十个类别</p>
+<img src="/2022/06/20/%E6%95%B0%E6%8D%AE%E9%9B%86/MNIST.jpg" class="" title="MNIST">
+
+<h3 id="MNIST数据集下载"><a href="#MNIST数据集下载" class="headerlink" title="MNIST数据集下载"></a>MNIST数据集下载</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">import torch</span><br><span class="line">import torchvision</span><br><span class="line">from torch.utils import data</span><br><span class="line">import torchvision.transforms as transforms</span><br><span class="line"></span><br><span class="line">trans = transforms.Compose([transforms.ToTensor()])</span><br><span class="line">train_data = torchvision.datasets.MNIST(root=&#x27;/data&#x27;, train=True, transform=trans, download=True)</span><br><span class="line">test_data = torchvision.datasets.MNIST(root=&#x27;/data&#x27;, train=False, transform=trans, download=True)</span><br><span class="line"></span><br><span class="line">train_iter = data.DataLoader(train_data, batch_size=256, shuffle=True)</span><br><span class="line">test_iter = data.DataLoader(test_data, batch_size=256, shuffle=True)</span><br></pre></td></tr></table></figure>
+
+<h2 id="FashionMNIST"><a href="#FashionMNIST" class="headerlink" title="FashionMNIST"></a>FashionMNIST</h2><h3 id="概述-1"><a href="#概述-1" class="headerlink" title="概述"></a>概述</h3><p>FashionMNIST数据集包含了10种类别的共7万个商品的图片. 其中6万个用作训练集, 1万个用作测试集. 每一张图片都是 $ 1<em>28</em>28 $ 的灰度图片. 官方描述如下:</p>
 <p>Fashion-MNIST is a dataset of Zalando’s article images—consisting of a training set of 60,000 examples and a test set of 10,000 examples. Each example is a 28x28 grayscale image, associated with a label from 10 classes. We intend Fashion-MNIST to serve as a direct drop-in replacement for the original MNIST dataset for benchmarking machine learning algorithms. It shares the same image size and structure of training and testing splits. (<a target="_blank" rel="noopener" href="https://github.com/zalandoresearch/fashion-mnist">https://github.com/zalandoresearch/fashion-mnist</a>)</p>
 <img src="/2022/06/20/%E6%95%B0%E6%8D%AE%E9%9B%86/FashionMNIST.jpg" class="" title="FashionMNIST">
 
