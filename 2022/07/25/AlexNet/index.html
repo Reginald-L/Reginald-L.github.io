@@ -158,6 +158,65 @@
                 <div class="container">
     
     
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6;    // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function () {
+            tocbot.refresh(obj_merge(tocbot_default_config, { hasInnerContainers: true }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function () {
+        tocbot.init(obj_merge(tocbot_default_config, { collapseDepth: 1 }));
+    });
+
+    function expandToc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, { collapseDepth: expanded ? 1 : DEPTH_MAX }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
 
     
     <article class="post-wrap">
@@ -180,7 +239,47 @@
         </header>
 
         <div class="post-content">
-            
+            <h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>AlexNet是LeNet的更深更大的一个版本, 和LeNet比较, 技术上讲AlexNet的主要改进体现在:</p>
+<ul>
+<li>丢弃法: 控制模型复杂度</li>
+<li>ReLU: ReLU相较于Sigmoid函数, 它一计算简单, 不需要进行幂运算; 二是当Sigmoid输出接近0或者1时, 其梯度接近于0, 从而导致反向传播无法继续更新参数. 而ReLU在正区间梯度恒为1.</li>
+<li>MaxPooling</li>
+</ul>
+<img src="/2022/07/25/AlexNet/Alex%E5%92%8CLeNet.png" class="" title="AlexNet和LeNet的模型比较">
+
+<h1 id="逐层解析"><a href="#逐层解析" class="headerlink" title="逐层解析"></a>逐层解析</h1><h2 id="第一个卷积层和池化层"><a href="#第一个卷积层和池化层" class="headerlink" title="第一个卷积层和池化层"></a>第一个卷积层和池化层</h2><ul>
+<li>输入: (3 * 224 *224)</li>
+<li>卷积输出: (96 * 54 * 54) &#x3D;&#x3D;&gt; $54 &#x3D; (224 - 11 + 4) &#x2F; 4$</li>
+<li>池化输出: (96 * 26 * 26) &#x3D;&#x3D;&gt; $(54 - 3) &#x2F; 2 + 1$</li>
+</ul>
+<h2 id="第二个卷积层和池化层"><a href="#第二个卷积层和池化层" class="headerlink" title="第二个卷积层和池化层"></a>第二个卷积层和池化层</h2><ul>
+<li>输入: (96 * 26 * 26)</li>
+<li>卷积输出: (256 * 26 * 26) &#x3D;&#x3D;&gt; $26 - 5 + 4 + 1$</li>
+<li>池化输出: (256 * 12 * 12) &#x3D;&#x3D;&gt; $(26 - 3) &#x2F; 2 + 1$</li>
+</ul>
+<h2 id="第三-四-五个卷积层"><a href="#第三-四-五个卷积层" class="headerlink" title="第三, 四, 五个卷积层"></a>第三, 四, 五个卷积层</h2><ul>
+<li>输入: (256 * 12 * 12)</li>
+<li>第三卷积输出: (384 * 12 * 12) &#x3D;&#x3D;&gt; $12 - 3 + 2 + 1$</li>
+<li>第四卷积输出: (384 * 12 * 12)</li>
+<li>第五卷积输出: (256 * 12 * 12)</li>
+<li>池化层输出: (256 * 5 * 5) &#x3D;&#x3D;&gt; $(12 - 3) &#x2F; 2 + 1$</li>
+</ul>
+<h2 id="两个全连接层"><a href="#两个全连接层" class="headerlink" title="两个全连接层"></a>两个全连接层</h2><ul>
+<li>输入: (256 * 5 * 5) &#x3D; 6400</li>
+<li>第一个输出: 4096</li>
+<li>第二个输出: 4096</li>
+<li>输出层: 1000</li>
+</ul>
+<h1 id="细节"><a href="#细节" class="headerlink" title="细节"></a>细节</h1><ul>
+<li>激活函数从Sigmoid换为了ReLU, 这缓解了梯度消失的问题</li>
+<li>在隐藏全连接层后加入了丢弃层</li>
+<li>数据增强: CNN对于位置信息, 颜色信息等等都是比较敏感的, 所以AlexNet做了数据增强, 尽可能多的让机器能在训练时见过各种情况下的猫, 如下图所示:<img src="/2022/07/25/AlexNet/%E6%95%B0%E6%8D%AE%E5%A2%9E%E5%BC%BA.png" class="" title="数据增强"></li>
+</ul>
+<h1 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h1><h2 id="导包"><a href="#导包" class="headerlink" title="导包"></a>导包</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">import torch</span><br><span class="line">from torch.utils import data</span><br><span class="line">from torch import nn</span><br><span class="line">import torchvision</span><br><span class="line">from torchvision import transforms as transforms</span><br></pre></td></tr></table></figure>
+<h2 id="AlexNet模型定义"><a href="#AlexNet模型定义" class="headerlink" title="AlexNet模型定义"></a>AlexNet模型定义</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"># 定义AlexNet模型, 用FashionMNIST数据集, 原文中是ImageNet数据集</span><br><span class="line">net = nn.Sequential(</span><br><span class="line">    # 卷积块</span><br><span class="line">    nn.Conv2d(in_channels=1, out_channels=96, kernel_size=11, stride=4, padding=1), nn.ReLU(),</span><br><span class="line">    nn.MaxPool2d(kernel_size=3, stride=2),</span><br><span class="line">    nn.Conv2d(in_channels=96, out_channels=256, kernel_size=5, padding=2), nn.ReLU(),</span><br><span class="line">    nn.MaxPool2d(kernel_size=3, stride=2),</span><br><span class="line">    nn.Conv2d(in_channels=256, out_channels=384, kernel_size=3, padding=1), nn.ReLU(),</span><br><span class="line">    nn.Conv2d(in_channels=384, out_channels=384, kernel_size=3, padding=1), nn.ReLU(),</span><br><span class="line">    nn.Conv2d(in_channels=384, out_channels=384, kernel_size=3, padding=1), nn.ReLU(),</span><br><span class="line">    nn.MaxPool2d(kernel_size=3, stride=2),</span><br><span class="line">    # 全连接块</span><br><span class="line">    nn.Flatten(),</span><br><span class="line">    nn.Linear(384*5*5, 4096), nn.ReLU(), nn.Dropout(p=0.5),</span><br><span class="line">    nn.Linear(4096, 4096), nn.ReLU(), nn.Dropout(p=0.5),</span><br><span class="line">    nn.Linear(4096, 10)</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<h2 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">for X, y in train_iter:</span><br><span class="line">    for layer in net:</span><br><span class="line">        X = layer(X)</span><br><span class="line">        print(layer.__class__.__name__, &#x27;output shape:\t&#x27;, X.shape)</span><br><span class="line">    break</span><br><span class="line">============ 结果如下 ==============</span><br><span class="line">Conv2d output shape:	 torch.Size([256, 96, 54, 54])</span><br><span class="line">ReLU output shape:	 torch.Size([256, 96, 54, 54])</span><br><span class="line">MaxPool2d output shape:	 torch.Size([256, 96, 26, 26])</span><br><span class="line">Conv2d output shape:	 torch.Size([256, 256, 26, 26])</span><br><span class="line">ReLU output shape:	 torch.Size([256, 256, 26, 26])</span><br><span class="line">MaxPool2d output shape:	 torch.Size([256, 256, 12, 12])</span><br><span class="line">Conv2d output shape:	 torch.Size([256, 384, 12, 12])</span><br><span class="line">ReLU output shape:	 torch.Size([256, 384, 12, 12])</span><br><span class="line">Conv2d output shape:	 torch.Size([256, 384, 12, 12])</span><br><span class="line">ReLU output shape:	 torch.Size([256, 384, 12, 12])</span><br><span class="line">Conv2d output shape:	 torch.Size([256, 256, 12, 12])</span><br><span class="line">ReLU output shape:	 torch.Size([256, 256, 12, 12])</span><br><span class="line">MaxPool2d output shape:	 torch.Size([256, 256, 5, 5])</span><br><span class="line">Flatten output shape:	 torch.Size([256, 6400])</span><br><span class="line">Linear output shape:	 torch.Size([256, 4096])</span><br><span class="line">ReLU output shape:	 torch.Size([256, 4096])</span><br><span class="line">Dropout output shape:	 torch.Size([256, 4096])</span><br><span class="line">Linear output shape:	 torch.Size([256, 4096])</span><br><span class="line">ReLU output shape:	 torch.Size([256, 4096])</span><br><span class="line">Dropout output shape:	 torch.Size([256, 4096])</span><br><span class="line">Linear output shape:	 torch.Size([256, 10])</span><br></pre></td></tr></table></figure>
+<h2 id="数据集"><a href="#数据集" class="headerlink" title="数据集"></a>数据集</h2><p>需要对原图像进行Resize, 使得其大小为 $(224 * 224)$</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># 数据集</span><br><span class="line">trans = transforms.Compose([transforms.Resize(size=224), transforms.ToTensor()])</span><br><span class="line">train_data = torchvision.datasets.FashionMNIST(root=&#x27;/data&#x27;, train=True, transform=trans, download=False)</span><br><span class="line">test_data = torchvision.datasets.FashionMNIST(root=&#x27;/data&#x27;, train=False, transform=trans, download=False)</span><br><span class="line"></span><br><span class="line">train_iter = data.DataLoader(train_data, batch_size=128, shuffle=True)</span><br><span class="line">test_iter = data.DataLoader(test_data, batch_size=128, shuffle=True)</span><br></pre></td></tr></table></figure>
         </div>
 
         
