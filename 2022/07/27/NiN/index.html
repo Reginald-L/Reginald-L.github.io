@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Reggie">
+
+
+
+
+
+<title>NiN | Reggie&#39;s blog</title>
+
+
+
+    <link rel="icon" href="/favicon.jpg">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+    <script src="/js/heart.js"></script>
+    
+
+
+
+    
+    
+        <!-- MathJax配置，可通过单美元符号书写行内公式等 -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+    "HTML-CSS": {
+        preferredFont: "TeX",
+        availableFonts: ["STIX","TeX"],
+        linebreaks: { automatic:true },
+        EqnChunk: (MathJax.Hub.Browser.isMobile ? 10 : 50)
+    },
+    tex2jax: {
+        inlineMath: [ ["$", "$"], ["\\(","\\)"] ],
+        processEscapes: true,
+        ignoreClass: "tex2jax_ignore|dno",
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        equationNumbers: { autoNumber: "AMS" },
+        noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } },
+        Macros: { href: "{}" }
+    },
+    messageStyle: "none"
+    });
+</script>
+<!-- 给MathJax元素添加has-jax class -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+<!-- 通过连接CDN加载MathJax的js代码 -->
+<script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+
+    
+
+
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Reggie&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Reggie&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6;    // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function () {
+            tocbot.refresh(obj_merge(tocbot_default_config, { hasInnerContainers: true }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function () {
+        tocbot.init(obj_merge(tocbot_default_config, { collapseDepth: 1 }));
+    });
+
+    function expandToc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, { collapseDepth: expanded ? 1 : DEPTH_MAX }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">NiN</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Reggie</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">July 27, 2022&nbsp;&nbsp;15:50:15</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="NiN的背景"><a href="#NiN的背景" class="headerlink" title="NiN的背景"></a>NiN的背景</h1><p>LeNet, AlexNet以及VGG等这种基于CNN架构的神经网络模型的一个共同之处在于, 他们都是先对图像进行卷积交叉运算, 然后在卷积块之后接一个或者多个全连接层对特征进行处理. 这种全连接层带来了两个问题:</p>
+<ol>
+<li>使用全连接层对特征进行处理可能会完全放弃对表征的空间结构</li>
+<li>卷积层使用的参数较少, 但是全连接层特别是紧接着卷积层的第一个全连接层可能会面临巨大的参数集: <br> LeNet &#x3D;&#x3D;&gt; 16×5×5×120&#x3D;48K; <br>AlexNet &#x3D;&#x3D;&gt; 256×5×5×54096 &#x3D; 26M; <br>VGG &#x3D;&#x3D;&gt; 512×7×7×4096 &#x3D; 102M</li>
+</ol>
+<blockquote>
+<p>NiN的做法是使用 1×1 的卷积层替换全连接层</p>
+</blockquote>
+<h1 id="NiN块"><a href="#NiN块" class="headerlink" title="NiN块"></a>NiN块</h1><img src="/2022/07/27/NiN/NiN%E5%9D%97.png" class="" title="NiN块">
+
+<ul>
+<li>三个卷积层组成, 其中后两个是充当全连接层的 1 × 1 的卷积层串联而成</li>
+<li>第一个层的超参数可以自己设置, 但是后两个充当全连接层的卷积层的参数是固定的: 输入输出通道保持一致, 核大小为1, 步幅为1</li>
+</ul>
+<h1 id="全局平均池化层"><a href="#全局平均池化层" class="headerlink" title="全局平均池化层"></a>全局平均池化层</h1><p>所谓全局平均池化层就是取每一个Feature Map中的平均值. 如下图所示:</p>
+<img src="/2022/07/27/NiN/%E5%85%A8%E5%B1%80%E6%9C%80%E5%A4%A7%E6%B1%A0%E5%8C%96.png" class="" title="全局最大池化和全局平局池化">
+
+<p>上图是全局最大池化的的过程, 它与全局平均池化的过程一样, 只不过一个是取最大值, 一个是取平均值.</p>
+<ul>
+<li>可以看出通过全局平均&#x2F;最大池化后可以达到降维的目的</li>
+<li>输入为 $(N * C * H * W)$, 输出为 $(N * C * 1 * 1)$</li>
+<li>一句话概括就是: 全局平均池化其实就是对每一个通道图所有像素值求平均值, 然后得到一个新的 $(1 * 1)$ 的通道图.</li>
+</ul>
+<h2 id="全局平均池化层的优势"><a href="#全局平均池化层的优势" class="headerlink" title="全局平均池化层的优势"></a>全局平均池化层的优势</h2><ol>
+<li>全局平均池化层, 其Feature Map(通道数)和分类类别一致, 让卷积架构更简单</li>
+<li>不需要进行参数优化, 这一层可以避免过拟合</li>
+<li>对空间信息进行了求和, 因此对输入的空间变换更具有稳定性</li>
+</ol>
+<h2 id="pytorch实现全局最大池化和全局平均池化层"><a href="#pytorch实现全局最大池化和全局平均池化层" class="headerlink" title="pytorch实现全局最大池化和全局平均池化层"></a>pytorch实现全局最大池化和全局平均池化层</h2><h3 id="全局最大池化层"><a href="#全局最大池化层" class="headerlink" title="全局最大池化层"></a>全局最大池化层</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 可以直接使用nn.AdaptiveAvgPool2d 只需要将其输出shape设置为 (1 × 1)</span><br><span class="line">nn.AdaptiveAvgPool2d((1, 1))</span><br></pre></td></tr></table></figure>
+<h3 id="全局最大池化层-1"><a href="#全局最大池化层-1" class="headerlink" title="全局最大池化层"></a>全局最大池化层</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nn.AdaptiveMaxPool2d((1, 1))</span><br></pre></td></tr></table></figure>
+
+<h1 id="NiN架构"><a href="#NiN架构" class="headerlink" title="NiN架构"></a>NiN架构</h1><ul>
+<li>无全连接层, NiN使⽤⼀个NiN块, 其输出通道数等于标签类别的数量 &#x3D;&#x3D;&gt; 不容易发生过拟合, 参数更少</li>
+<li>交替使用NiN块和步幅为2的最大池化层, 逐步较小宽高和增大通道数 </li>
+<li>最后使用全局平均池化层得出输出<img src="/2022/07/27/NiN/NiN%E6%9E%B6%E6%9E%84.png" class="" title="NiN架构"></li>
+</ul>
+<h1 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h1><h2 id="定义NiN块"><a href="#定义NiN块" class="headerlink" title="定义NiN块"></a>定义NiN块</h2><ul>
+<li>三个卷积层</li>
+<li>第一个的参数可以自定义, 随后两个的参数为固定<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># 定义NiN块</span><br><span class="line">def nin_block(in_channels, out_channels, kernel_size, strides, padding):</span><br><span class="line">    return nn.Sequential(</span><br><span class="line">        nn.Conv2d(in_channels, out_channels, kernel_size, strides, padding), nn.ReLU(),</span><br><span class="line">        nn.Conv2d(out_channels, out_channels, kernel_size=1), nn.ReLU(),</span><br><span class="line">        nn.Conv2d(out_channels, out_channels, kernel_size=1), nn.ReLU()</span><br><span class="line">    )</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="定义NiN模型"><a href="#定义NiN模型" class="headerlink" title="定义NiN模型"></a>定义NiN模型</h2><ul>
+<li>NiN架构的卷积层分别是 (11*11), (5 * 5) 和 (3 * 3)</li>
+<li>池化层的大小为 (3 * 3), stride为2<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">net = nn.Sequential(</span><br><span class="line">    nin_block(1, 96, kernel_size=11, strides=4, padding=0), </span><br><span class="line">    nn.MaxPool2d(kernel_size=3, stride=2),</span><br><span class="line">    nin_block(96, 256, kernel_size=5, strides=1, padding=2),</span><br><span class="line">    nn.MaxPool2d(kernel_size=3, stride=2),</span><br><span class="line">    nin_block(256, 384, kernel_size=3, strides=1, padding=1),</span><br><span class="line">    nn.MaxPool2d(kernel_size=3, stride=2), </span><br><span class="line">    nn.Dropout(0.5),</span><br><span class="line">    # 输出通道数和分类类别数一致</span><br><span class="line">    nin_block(384, 10, kernel_size=3, strides=1, padding=1),</span><br><span class="line">    nn.AdaptiveAvgPool2d((1, 1)), # ==&gt; 输出shape为 (N*10*1*1)</span><br><span class="line">    nn.Flatten() # ==&gt; 输出shape为 (N * 10)</span><br><span class="line">)</span><br></pre></td></tr></table></figure></li>
+</ul>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Reggie</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://reginald-l.github.io/2022/07/27/NiN/">https://reginald-l.github.io/2022/07/27/NiN/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2022 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span><strong>I am a slow walker, but I never walk backwards!!!</strong></span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"># 深度学习</a>
+                    
+                        <a href="/tags/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/"># 神经网络</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+            <a class="next" rel="next" href="/2022/07/27/VGG/">VGG</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span> Copyright © Reggie | 2022 </span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>
