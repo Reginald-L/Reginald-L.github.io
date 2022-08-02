@@ -248,7 +248,7 @@
 </blockquote>
 <ol>
 <li>固定小批量里面的均值和方差<br>$$<br>\begin{cases}<br>\mu_B &#x3D; \frac{1}{|B|} \sum_{i \in B} x_i \\<br>\sigma_B^2 &#x3D; \frac{1}{|B|} \sum_{i \in B} (x_i - \mu_B)^2 + \epsilon<br>\tag {1}<br>\end{cases}<br>$$</li>
-<li>做额外的调整<br>$$<br>x_{i+1} &#x3D; \gamma \frac{x_i - \mu_B}{\sigma_B} + \beta \tag {2}<br>$$<br>联立 1 和 2 可得:<br>$$<br>x_{i+1} &#x3D; \gamma \frac{x_i - \mu_B}{\sqrt{\frac{1}{|B|} \sum_{i \in B} (x_i - \mu_B)^2 + \epsilon}} + \beta<br>$$<br>其中 $ \gamma $ 和 $\beta$ 是需要和其他参数一起学习的, 分别表示缩放和偏移</li>
+<li>做额外的调整<br>$$<br>x_{i} &#x3D; \gamma \frac{x_i - \mu_B}{\sigma_B} + \beta \tag {2}<br>$$<br>联立 1 和 2 可得:<br>$$<br>x_{i} &#x3D; \gamma \frac{x_i - \mu_B}{\sqrt{\frac{1}{|B|} \sum_{i \in B} (x_i - \mu_B)^2 + \epsilon}} + \beta<br>$$<br>其中 $ \gamma $ 和 $\beta$ 是需要和其他参数一起学习的, 分别表示缩放和偏移</li>
 </ol>
 <h1 id="批量归一化层"><a href="#批量归一化层" class="headerlink" title="批量归一化层"></a>批量归一化层</h1><ul>
 <li>可学习的参数为: $ \gamma $ 和 $\beta$</li>
