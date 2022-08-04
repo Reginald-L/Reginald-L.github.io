@@ -246,7 +246,7 @@
 <p>关于通道数的一个分配猜想:<br>从192到256, 在4个橘黄色的子块中, 三个抽取空间特征, 而且3*3核窗口计算开销也能接受且抽取的信息也不至于丢失太多, 所以将一般的通道 (128) 留给3*3的卷积层; 其次剩下一个抽取非空间特征的 1 * 1 卷积层, 给其分配一半(64) 的通道; 最后剩下两个平分.</p>
 </blockquote>
 <ul>
-<li>跟单个3<em>3或者5</em>5的卷积层相比, Inception块有效地降低了参数个数, 并且降低了计算复杂度.</li>
+<li>跟单个 $3*3$ 或者 $5*5$ 的卷积层相比, Inception块有效地降低了参数个数, 并且降低了计算复杂度.</li>
 </ul>
 <h1 id="GoogLeNet架构"><a href="#GoogLeNet架构" class="headerlink" title="GoogLeNet架构"></a>GoogLeNet架构</h1><ul>
 <li>5段, 9个inception块<img src="/2022/07/28/GoogLeNet/GoogLeNet.png" class="" title="GoogLeNet模型的全貌"></li>
