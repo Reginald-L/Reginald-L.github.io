@@ -242,6 +242,7 @@
             <h2 id="常见数据集"><a href="#常见数据集" class="headerlink" title="常见数据集"></a>常见数据集</h2><ul>
 <li>MNIST</li>
 <li>FashionMNIST</li>
+<li>CIFAR10</li>
 </ul>
 <h2 id="MNIST"><a href="#MNIST" class="headerlink" title="MNIST"></a>MNIST</h2><h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p>MNIST是一个手写数字数据集, 包含了 50000 个训练数据和10000个测试数据. 每一张图片都是 $1*28*28$, 一共有 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 十个类别</p>
 <img src="/2022/06/20/%E6%95%B0%E6%8D%AE%E9%9B%86/MNIST.jpg" class="" title="MNIST">
@@ -324,6 +325,12 @@
 
 <h3 id="汇总"><a href="#汇总" class="headerlink" title="汇总"></a>汇总</h3><p>可以通过一下pytorch代码直接下载并使用FashionMNIST.</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">def load_data_fashion_mnist(batch_size, resize=None):</span><br><span class="line">    &quot;&quot;&quot;下载Fashion-MNIST数据集， 然后将其加载到内存中&quot;&quot;&quot;</span><br><span class="line">    # resize决定是否需要把图片变得更大一点</span><br><span class="line">    trans = [transforms.ToTensor()]</span><br><span class="line">    if resize:</span><br><span class="line">        trans.insert(0, transforms.Resize(resize))</span><br><span class="line">    trans = transforms.Compose(trans)</span><br><span class="line">    mnist_train = torchvision.datasets.FashionMNIST(root=&#x27;../data&#x27;, train=True, transform=trans, download=True)</span><br><span class="line">    mnist_test = torchvision.datasets.FashionMNIST(root=&#x27;../data&#x27;, train=False, transform=trans, download=True)</span><br><span class="line">    </span><br><span class="line">    return (data.DataLoader(mnist_train, batch_size=batch_size, shuffle=True, num_workers=get_dataloader_workers()),</span><br><span class="line">           data.DataLoader(mnist_test, batch_size=batch_size, shuffle=True, num_workers=get_dataloader_workers()))</span><br></pre></td></tr></table></figure>
+
+<h2 id="CIFAR10"><a href="#CIFAR10" class="headerlink" title="CIFAR10"></a>CIFAR10</h2><h3 id="概述-2"><a href="#概述-2" class="headerlink" title="概述"></a>概述</h3><p>CIFAR10和FashionMNIST的复杂度差不多, 不同在于CIFAR10是彩色图片.</p>
+<p>CIFAR10是从ImageNet中抽取出10个类别构建的小的入门数据集</p>
+<p>CIFAR10的获取方法与FashionMNIST一样, 都可以通过torchvision.datasets中对应的类来加载.</p>
+<p>大小为 32 * 32</p>
+
         </div>
 
         
