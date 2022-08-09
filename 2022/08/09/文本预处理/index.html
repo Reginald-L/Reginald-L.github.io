@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Reggie">
+
+
+
+
+
+<title>文本预处理 | Reggie&#39;s blog</title>
+
+
+
+    <link rel="icon" href="/favicon.jpg">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+    <script src="/js/heart.js"></script>
+    
+
+
+
+    
+    
+        <!-- MathJax配置，可通过单美元符号书写行内公式等 -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+    "HTML-CSS": {
+        preferredFont: "TeX",
+        availableFonts: ["STIX","TeX"],
+        linebreaks: { automatic:true },
+        EqnChunk: (MathJax.Hub.Browser.isMobile ? 10 : 50)
+    },
+    tex2jax: {
+        inlineMath: [ ["$", "$"], ["\\(","\\)"] ],
+        processEscapes: true,
+        ignoreClass: "tex2jax_ignore|dno",
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        equationNumbers: { autoNumber: "AMS" },
+        noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } },
+        Macros: { href: "{}" }
+    },
+    messageStyle: "none"
+    });
+</script>
+<!-- 给MathJax元素添加has-jax class -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+<!-- 通过连接CDN加载MathJax的js代码 -->
+<script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+
+    
+
+
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Reggie&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Reggie&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6;    // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function () {
+            tocbot.refresh(obj_merge(tocbot_default_config, { hasInnerContainers: true }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function () {
+        tocbot.init(obj_merge(tocbot_default_config, { collapseDepth: 1 }));
+    });
+
+    function expandToc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, { collapseDepth: expanded ? 1 : DEPTH_MAX }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">文本预处理</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Reggie</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">August 9, 2022&nbsp;&nbsp;18:57:51</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <p>文本预处理就是将文本变成能够训练的东西</p>
+<table>
+<thead>
+<tr>
+<th>步骤</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>加载文本数据</td>
+<td>加载所要的文本</td>
+</tr>
+<tr>
+<td>分词 (tokenize)</td>
+<td>将文本按照 $word$ or $char$进行划分</td>
+</tr>
+<tr>
+<td>构建词汇表(vocabulary)</td>
+<td>构建文本到数字的映射关系表</td>
+</tr>
+<tr>
+<td>数字化</td>
+<td>根据词汇表将文本token转为数字</td>
+</tr>
+</tbody></table>
+<h1 id="导包"><a href="#导包" class="headerlink" title="导包"></a>导包</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">import collections</span><br><span class="line">import re</span><br></pre></td></tr></table></figure>
+
+<h1 id="数据加载"><a href="#数据加载" class="headerlink" title="数据加载"></a>数据加载</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"># 加载文本</span><br><span class="line">d2l.DATA_HUB[&#x27;time_machine&#x27;] = (d2l.DATA_URL + &#x27;timemachine.txt&#x27;, &#x27;090b5e7e0c295757f55df93cb0a180b969189a&#x27;)</span><br><span class="line"></span><br><span class="line">def read_time_machine():</span><br><span class="line">    &quot;&quot;&quot;load the time machine dataset into a list of text lines.&quot;&quot;&quot;</span><br><span class="line">    with open(d2l.download(&#x27;time_machine&#x27;), &#x27;r&#x27;) as f:</span><br><span class="line">        lines = f.readlines()</span><br><span class="line">        # 将不是字母的东西都用空白字符替换, 然后全转为小写</span><br><span class="line">    return [re.sub(&#x27;[^A-Za-z]+&#x27;, &#x27; &#x27;, line).strip().lower() for line in lines]</span><br><span class="line"></span><br><span class="line">lines = read_time_machine()</span><br></pre></td></tr></table></figure>
+
+<h1 id="分词"><a href="#分词" class="headerlink" title="分词"></a>分词</h1><blockquote>
+<p>一行文本是不能够训练的, 所以需要按照一个基本单元(word or char)将其拆分为不同的词元列表token list</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">def tokenize(lines, token=&#x27;word&#x27;):</span><br><span class="line">    &quot;&quot;&quot;将每一行文本拆分成单词或者字符标记列表&quot;&quot;&quot;</span><br><span class="line">    if token == &#x27;word&#x27;:</span><br><span class="line">        return [line.split() for line in lines]</span><br><span class="line">    elif token == &#x27;char&#x27;:</span><br><span class="line">        return [list(line) for line in lines]</span><br><span class="line">    else:</span><br><span class="line">        print(&#x27;Error: unknown token type: &#x27; + token)</span><br></pre></td></tr></table></figure>
+
+<h1 id="构建词汇表"><a href="#构建词汇表" class="headerlink" title="构建词汇表"></a>构建词汇表</h1><blockquote>
+<p>构建词汇表 Vocabulary(字典). 用来将token字符串映射到从0开始的数字索引中</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line">class Vocab:</span><br><span class="line">    &quot;&quot;&quot;文本词汇表&quot;&quot;&quot;</span><br><span class="line">    &#x27;&#x27;&#x27;</span><br><span class="line">    args: tokens --&gt; 现在所有的tokens</span><br><span class="line">          min_freq --&gt; 将出现少于min_freq次的token丢掉</span><br><span class="line">          reserved_tokes --&gt; 类似于句子开头或者结尾的tokens</span><br><span class="line">    &#x27;&#x27;&#x27;</span><br><span class="line">    def __init__(self, tokens=None, min_freq=0, reserved_tokens=None):</span><br><span class="line">        if tokens == None:</span><br><span class="line">            tokens = []</span><br><span class="line">        if reserved_tokens is None:</span><br><span class="line">            reserved_tokens = []</span><br><span class="line">        # 统计token频率</span><br><span class="line">        counter = count_corpus(tokens)</span><br><span class="line">        # 按照出现频率对tokens排序</span><br><span class="line">        self.token_freqs = sorted(counter.items(), key=lambda x:x[1], reverse=True)</span><br><span class="line">        # unknown token的下标记为0</span><br><span class="line">        # uniq_tokens 是我们需要的tokens, 包含了unknown和reserved_tokens</span><br><span class="line">        self.unk, uniq_tokens = 0, [&#x27;&lt;unk&gt;&#x27;] + reserved_tokens</span><br><span class="line">        # 将出现频率大于等于min_freq的tokens加入到uniq_tokens</span><br><span class="line">        uniq_tokens += [</span><br><span class="line">            token for token, freq in self.token_freqs</span><br><span class="line">            if freq &gt;= min_freq and token not in uniq_tokens</span><br><span class="line">        ]</span><br><span class="line">        # idx_to_token --&gt; 根据下标寻找token</span><br><span class="line">        # token_to_idx --&gt; 一个字典, 根据token返回index</span><br><span class="line">        self.idx_to_token, self.token_to_idx = [], dict()</span><br><span class="line">        # 构造idx_to_token和token_to_idx</span><br><span class="line">        for token in uniq_tokens:</span><br><span class="line">            self.idx_to_token.append(token)</span><br><span class="line">            self.token_to_idx[token] = len(self.idx_to_token) - 1</span><br><span class="line">    </span><br><span class="line">    def __len__(self):</span><br><span class="line">        &quot;&quot;&quot;本质是uniq_tokens中的token个数&quot;&quot;&quot;</span><br><span class="line">        return len(self.idx_to_token)</span><br><span class="line">    </span><br><span class="line">    def __getitem__(self, tokens):</span><br><span class="line">        &quot;&quot;&quot;返回tokens的indices&quot;&quot;&quot;</span><br><span class="line">        if not isinstance(tokens, (list, tuple)):</span><br><span class="line">            return self.token_to_idx.get(tokens, self.unk)</span><br><span class="line">        return [self.__getitem__(token) for token in tokens]</span><br><span class="line"></span><br><span class="line">    def to_tokens(self, indices):</span><br><span class="line">        &quot;&quot;&quot;根据indices返回对应的tokens, 和getitem互为反函数&quot;&quot;&quot;</span><br><span class="line">        if not isinstance(indices, (list, tuple)):</span><br><span class="line">            return self.idx_to_token(indices)</span><br><span class="line">        return [self.idx_to_token[index] for index in indices]</span><br><span class="line">    </span><br><span class="line">def count_corpus(tokens):</span><br><span class="line">    &quot;&quot;&quot;统计token的频率&quot;&quot;&quot;</span><br><span class="line">    if len(tokens) == 0 or isinstance(tokens[0], list):</span><br><span class="line">        # 将tokens转为一个list</span><br><span class="line">        tokens = [token for line in tokens for token in line]</span><br><span class="line">    # Counter统计每一个token出现的次数 </span><br><span class="line">    return collections.Counter(tokens)</span><br><span class="line"></span><br><span class="line">vocab = Vocab(tokens)</span><br><span class="line"></span><br><span class="line">print(list(vocab.token_to_idx.items())[:10])</span><br></pre></td></tr></table></figure>
+<h1 id="将每个token-list转为对应的数字list"><a href="#将每个token-list转为对应的数字list" class="headerlink" title="将每个token list转为对应的数字list"></a>将每个token list转为对应的数字list</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"># 将每一条文本转为一个数字索引列表</span><br><span class="line">for i in [0, 10]:</span><br><span class="line">    print(&#x27;words:&#x27;, tokens[i])</span><br><span class="line">    print(&#x27;indices:&#x27;, vocab[tokens[i]])</span><br><span class="line"></span><br><span class="line">===========结果如下============</span><br><span class="line">words: [&#x27;the&#x27;, &#x27;time&#x27;, &#x27;machine&#x27;, &#x27;by&#x27;, &#x27;h&#x27;, &#x27;g&#x27;, &#x27;wells&#x27;]</span><br><span class="line">indices: [1, 19, 50, 40, 2183, 2184, 400]</span><br><span class="line">words: [&#x27;twinkled&#x27;, &#x27;and&#x27;, &#x27;his&#x27;, &#x27;usually&#x27;, &#x27;pale&#x27;, &#x27;face&#x27;, &#x27;was&#x27;, &#x27;flushed&#x27;, &#x27;and&#x27;, &#x27;animated&#x27;, &#x27;the&#x27;]</span><br><span class="line">indices: [2186, 3, 25, 1044, 362, 113, 7, 1421, 3, 1045, 1]</span><br></pre></td></tr></table></figure>
+
+<h1 id="将所有功能组合"><a href="#将所有功能组合" class="headerlink" title="将所有功能组合"></a>将所有功能组合</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">def text_process(max_tokens=-1):</span><br><span class="line">    lines = read_time_machine()</span><br><span class="line">    tokens = tokenize(lines, &#x27;char&#x27;)</span><br><span class="line">    vocab = Vocab(tokens)</span><br><span class="line">    corpus = [vocab[token] for line in tokens for token in line]</span><br><span class="line">    if max_tokens &gt; 0:</span><br><span class="line">        corpus = corpus[:max_tokens]</span><br><span class="line">    return corpus, vocab</span><br><span class="line"></span><br><span class="line">corpus, vocab = text_process()</span><br><span class="line">len(corpus), len(vocab)</span><br></pre></td></tr></table></figure>
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Reggie</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://reginald-l.github.io/2022/08/09/%E6%96%87%E6%9C%AC%E9%A2%84%E5%A4%84%E7%90%86/">https://reginald-l.github.io/2022/08/09/%E6%96%87%E6%9C%AC%E9%A2%84%E5%A4%84%E7%90%86/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2022 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span><strong>I am a slow walker, but I never walk backwards!!!</strong></span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"># 深度学习</a>
+                    
+                        <a href="/tags/%E6%96%87%E6%9C%AC%E9%A2%84%E5%A4%84%E7%90%86/"># 文本预处理</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+            <a class="next" rel="next" href="/2022/08/06/%E6%95%B0%E6%8D%AE%E5%A2%9E%E5%B9%BF/">数据增广</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span> Copyright © Reggie | 2022 </span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>
