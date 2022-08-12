@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Reggie">
+
+
+
+
+
+<title>语言模型 | Reggie&#39;s blog</title>
+
+
+
+    <link rel="icon" href="/favicon.jpg">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+    <script src="/js/heart.js"></script>
+    
+
+
+
+    
+    
+        <!-- MathJax配置，可通过单美元符号书写行内公式等 -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+    "HTML-CSS": {
+        preferredFont: "TeX",
+        availableFonts: ["STIX","TeX"],
+        linebreaks: { automatic:true },
+        EqnChunk: (MathJax.Hub.Browser.isMobile ? 10 : 50)
+    },
+    tex2jax: {
+        inlineMath: [ ["$", "$"], ["\\(","\\)"] ],
+        processEscapes: true,
+        ignoreClass: "tex2jax_ignore|dno",
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        equationNumbers: { autoNumber: "AMS" },
+        noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } },
+        Macros: { href: "{}" }
+    },
+    messageStyle: "none"
+    });
+</script>
+<!-- 给MathJax元素添加has-jax class -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+<!-- 通过连接CDN加载MathJax的js代码 -->
+<script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+
+    
+
+
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Reggie&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Reggie&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6;    // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function () {
+            tocbot.refresh(obj_merge(tocbot_default_config, { hasInnerContainers: true }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function () {
+        tocbot.init(obj_merge(tocbot_default_config, { collapseDepth: 1 }));
+    });
+
+    function expandToc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, { collapseDepth: expanded ? 1 : DEPTH_MAX }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">语言模型</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Reggie</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">August 12, 2022&nbsp;&nbsp;10:02:48</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <p>给定文本序列 $x_1, x_2, …, x_T$, 语言模型的目标就是估计联合概率 $p(x_1, x_2, …, x_T)$</p>
+<p>$x_1, x_2, …, x_T$ 根据token不同可以是一个一个的单词, 也可以是一个一个的字符.</p>
+<p>它的应用包括:</p>
+<ul>
+<li>做预训练模型 (比如BERT, GPT-3)</li>
+<li>生成文本, 给定前面几个词, 不断的使用 $x_t ~ p(x_t | x1, …, x_{t-1})$ 来生成后续的文本</li>
+<li>判断多个序列中那个更常见, 比如 “to recognize a speech” vs “to wreck a nice beach”</li>
+</ul>
+<h1 id="用计数法构建模型"><a href="#用计数法构建模型" class="headerlink" title="用计数法构建模型"></a>用计数法构建模型</h1><ul>
+<li><p>假设文本序列的长度为2, 则<br>$$<br>p(x, x^{‘}) &#x3D; p(x)p(x^{‘} | x) &#x3D; \frac{n(x)}{n} × \frac{n(x, x^{‘})}{n(x)}<br>$$<br>其中, $n$ 是总词数, $n(x)$ 是 $x$ 出现的次数, $n(x, x^{‘})$ 是 $x x^{‘}$ 连续词对出现的次数</p>
+</li>
+<li><p>扩展到3的情况<br>$$<br>p(x, x^{‘}, x^{“}) &#x3D; p(x)p(x^{‘} | x)p(x^{“} | x, x^{‘}) &#x3D; \frac{n(x)}{n} × \frac{n(x, x^{‘})}{n(x)} × \frac{n(n, x^{‘}, x^{“})}{n(x, x^{‘})}<br>$$</p>
+</li>
+</ul>
+<h1 id="当长度很长时-使用N元语法"><a href="#当长度很长时-使用N元语法" class="headerlink" title="当长度很长时:使用N元语法"></a>当长度很长时:使用N元语法</h1><p>Ngram是基于马尔科夫假设的. </p>
+<ul>
+<li><p>一元语法: $(\tau &#x3D; 0)$<br>$$<br>p(x_1, x_2, x_3, x_4) &#x3D; p(x_1)p(x_2)p(x_3)p(x_4) &#x3D; \frac{n(x_1)}{n}\frac{n(x_2)}{n}\frac{n(x_3)}{n}\frac{n(x_4)}{n}<br>$$</p>
+</li>
+<li><p>二元语法: $(\tau &#x3D; 1)$<br>$$<br>p(x_1, x_2, x_3, x_4) &#x3D; p(x_1)p(x_2|x_1)p(x_3|x_2)p(x_4|x_3) &#x3D; \frac{n(x_1)}{n}\frac{n(x_1, x_2)}{n_1}\frac{n(x_2, x_3)}{n_2}\frac{n(x_3, x_4)}{n_3}<br>$$</p>
+</li>
+<li><p>三元语法: $(\tau &#x3D; 2)$<br>$$<br>p(x_1, x_2, x_3, x_4) &#x3D; p(x_1)p(x_2|x_1)p(x_3|x_2, x_1)p(x_4|x_3, x_2)<br>$$</p>
+</li>
+</ul>
+<h1 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">import random</span><br><span class="line">import torch</span><br><span class="line">from d2l import torch as d2l</span><br><span class="line"></span><br><span class="line">tokens = d2l.tokenize(d2l.read_time_machine())</span><br><span class="line">corpus = [token for line in tokens for token in line]</span><br><span class="line">vocab = d2l.Vocab(corpus)</span><br><span class="line"></span><br><span class="line"># ngram n=2</span><br><span class="line">bigram_tokens = [pair for pair in zip(corpus[:-1], corpus[1:])]</span><br><span class="line">bigram_vocab = d2l.Vocab(bigram_tokens)</span><br><span class="line">bigram_vocab.token_freqs[:10]</span><br><span class="line"></span><br><span class="line"># ngram n=3</span><br><span class="line">trigram_tokens = [triple for triple in zip(corpus[:-2], corpus[1:-1], corpus[2:])]</span><br><span class="line">trigram_vocab = d2l.Vocab(trigram_tokens)</span><br><span class="line">trigram_vocab.token_freqs</span><br><span class="line"></span><br><span class="line"># ngram n=4</span><br><span class="line">quad_tokens = [quad for quad in zip(corpus[:-3], corpus[1:-2], corpus[2:-1], corpus[3:])]</span><br><span class="line">quad_vocab = d2l.Vocab(quad_tokens)</span><br><span class="line">quad_vocab.token_freqs</span><br><span class="line"></span><br><span class="line"># ngram n=5</span><br><span class="line">five_tokens = [five for five in zip(corpus[:-4], corpus[1:-3], corpus[2:-2], corpus[3:-1], corpus[4:])]</span><br><span class="line">five_vocab = d2l.Vocab(five_tokens)</span><br><span class="line">five_vocab.token_freqs</span><br><span class="line"></span><br><span class="line"># ngram n=6</span><br><span class="line">six_tokens = [six for six in zip(corpus[:-5], corpus[1:-4], corpus[2:-3], corpus[3:-2], corpus[4:-1], corpus[5:])]</span><br><span class="line">six_vocab = d2l.Vocab(six_tokens)</span><br><span class="line">six_vocab.token_freqs</span><br><span class="line"></span><br><span class="line"># ngram n=7</span><br><span class="line">seven_tokens = [seven for seven in zip(corpus[:-6], corpus[1:-5], corpus[2:-4], corpus[3:-3], corpus[4:-2], corpus[5:-1], corpus[6:])]</span><br><span class="line">seven_vocab = d2l.Vocab(seven_tokens)</span><br><span class="line">seven_vocab.token_freqs</span><br></pre></td></tr></table></figure>
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Reggie</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://reginald-l.github.io/2022/08/12/%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B/">https://reginald-l.github.io/2022/08/12/%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2022 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span><strong>I am a slow walker, but I never walk backwards!!!</strong></span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"># 深度学习</a>
+                    
+                        <a href="/tags/%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B/"># 语言模型</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+            <a class="next" rel="next" href="/2022/08/09/%E6%96%87%E6%9C%AC%E9%A2%84%E5%A4%84%E7%90%86/">文本预处理</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span> Copyright © Reggie | 2022 </span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>
