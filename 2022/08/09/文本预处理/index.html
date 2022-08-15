@@ -260,11 +260,11 @@
 </tr>
 <tr>
 <td>构建词汇表(vocabulary)</td>
-<td>构建文本到数字的映射关系表</td>
+<td>构建文本到数字的映射关系表.</td>
 </tr>
 <tr>
 <td>数字化</td>
-<td>根据词汇表将文本token转为数字</td>
+<td>根据词汇表将文本token转为数字. 这些数字在给模型输入之前, 会先把他们构建成一个embedding层, 不会直接将数字输入到模型中</td>
 </tr>
 </tbody></table>
 <h1 id="导包"><a href="#导包" class="headerlink" title="导包"></a>导包</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">import collections</span><br><span class="line">import re</span><br></pre></td></tr></table></figure>
