@@ -13,7 +13,7 @@
 
 
 
-<title>GRU | Reggie&#39;s blog</title>
+<title>LSTM | Reggie&#39;s blog</title>
 
 
 
@@ -219,7 +219,7 @@
     
     <article class="post-wrap">
         <header class="post-header">
-            <h1 class="post-title">GRU</h1>
+            <h1 class="post-title">LSTM</h1>
             
                 <div class="post-meta">
                     
@@ -228,7 +228,7 @@
 
                     
                         <span class="post-time">
-                        Date: <a href="#">August 26, 2022&nbsp;&nbsp;17:53:49</a>
+                        Date: <a href="#">August 28, 2022&nbsp;&nbsp;20:36:01</a>
                         </span>
                     
                     
@@ -237,39 +237,20 @@
         </header>
 
         <div class="post-content">
-            <p>Gated Recurrent Unit (GRU) 门控循环单元是一种基于RNN架构的网络模型.</p>
-<p>RNN将所有的信息都存储在一个隐藏状态中, 随着序列的增加, 这个状态包含了过多的信息, 对于太久以前的事情就不太容易从里面抽取出来了</p>
-<p>GRU的出发点在于对于一个长序列来讲, 并不是保留的信息越多越好, 对于结果其实重要的信息就那么几个, 比如预测股票重要的也就那么一些重要的点的信息. 对于RNN来讲所有的点都是一样重要的, 但是GRU就通过一些门控机制达到了对一些不重要信息的遗忘的目的.</p>
-<table>
-<thead>
-<tr>
-<th></th>
-<th>解释</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>更新门</td>
-<td>能关注的机制</td>
-</tr>
-<tr>
-<td>重置门</td>
-<td>能遗忘的机制</td>
-</tr>
-</tbody></table>
-<h1 id="GRU"><a href="#GRU" class="headerlink" title="GRU"></a>GRU</h1><p>在RNN的基础上引入了两个门: 更新门和重置门, 两个门都是使用的 $\sigma 激活函数$</p>
-<img src="/2022/08/26/GRU/GRU.png" class="" title="GRU">
+            <p>LSTM 它的隐藏层中包含了两个对象: 记忆单元 (memory) 和 隐状态 (hidden state). 两者的形状是一样的, 都是 $(batch\_size, num\_hiddens)$</p>
+<ul>
+<li>忘记门</li>
+<li>输入门</li>
+<li>输出门</li>
+</ul>
+<h1 id="LSTM"><a href="#LSTM" class="headerlink" title="LSTM"></a>LSTM</h1><img src="/2022/08/28/LSTM/LSTM.png" class="" title="LSTM">
 
-<h2 id="门-gate"><a href="#门-gate" class="headerlink" title="门 gate"></a>门 gate</h2><p>门本质也是一个全连接层, 其大小和隐藏状态的大小是一样的, 其计算公式如下:<br>$$<br>R_t &#x3D; \sigma(X_tW_{xr} + H_{t-1}W_{hr} + b_r) \\<br>Z_t &#x3D; \sigma(X_tW_{xz} + H_{t-1}W_{hz} + b_z)<br>$$<br>其中 $W_{xr}$ 是输入层到重置门的权重, $W_{hr}$ 是隐藏层到重置门的权重. 同理 $W_{xz} 和 W_{hz}$ 分别是输入层和隐藏层到更新门的权重矩阵. $W_{xr}, W_{xz} 和 W_{xh}$ 的形状都一样都是 $(num\_inputs, num\_hiddens)$</p>
-<p>$W_{hr}, W_{hz} 和 W_{hh}$ 的形状一样都是 $(num\_hiddens, num\_hiddens)$</p>
-<h2 id="候选隐状态"><a href="#候选隐状态" class="headerlink" title="候选隐状态"></a>候选隐状态</h2><p>$$<br>\widetilde{H_t} &#x3D; tanh(X_tW_{xh} + (R_t \odot H_{t-1})W_{hh} + b_h)<br>$$</p>
-<blockquote>
-<p>$R_t$ 用的是 $\sigma$ 激活函数, 所以它的取值在[0, 1]之间. 若 $(R_t \odot H_{t-1})$ 的值越趋近于0, 越说明前面的信息不重要, 越靠近1越重要</p>
-</blockquote>
-<h2 id="隐状态"><a href="#隐状态" class="headerlink" title="隐状态"></a>隐状态</h2><p>$$<br>H_t &#x3D; Z_t \odot H_{t-1} + (1 - Z_t) \odot \widetilde{H_t}<br>$$</p>
-<h1 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h1><h2 id="从零开始"><a href="#从零开始" class="headerlink" title="从零开始"></a>从零开始</h2><h3 id="初始化模型参数"><a href="#初始化模型参数" class="headerlink" title="初始化模型参数"></a>初始化模型参数</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"># 初始化模型参数</span><br><span class="line">def get_params(vocab_size, num_hiddens, device):</span><br><span class="line">    num_inputs = num_outputs = vocab_size</span><br><span class="line">    </span><br><span class="line">    def normal(shape):</span><br><span class="line">        return torch.randn(size=shape, device=device) * 0.01</span><br><span class="line">    </span><br><span class="line">    def three():</span><br><span class="line">        return (normal((num_inputs, num_hiddens)), </span><br><span class="line">                normal((num_hiddens, num_hiddens)), </span><br><span class="line">                torch.zeros(num_hiddens, device=device))</span><br><span class="line">    </span><br><span class="line">    W_xz, W_hz, b_z = three()</span><br><span class="line">    W_xr, W_hr, b_r = three()</span><br><span class="line">    W_xh, W_hh, b_h = three()</span><br><span class="line">    W_hq = normal((num_hiddens, num_outputs))</span><br><span class="line">    b_q = torch.zeros(num_outputs, device=device)</span><br><span class="line">    params = [W_xz, W_hz, b_z, W_xr, W_hr, b_r, W_xh, W_hh, b_h, W_hq, b_q]</span><br><span class="line">    for param in params:</span><br><span class="line">        param.requires_grad_(True)</span><br><span class="line">    return params</span><br></pre></td></tr></table></figure>
-<h3 id="初始化隐藏状态"><a href="#初始化隐藏状态" class="headerlink" title="初始化隐藏状态"></a>初始化隐藏状态</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">def init_gru_state(batch_size, num_hiddens, device):</span><br><span class="line">    return (torch.zeros((batch_size, num_hiddens), device=device),)</span><br></pre></td></tr></table></figure>
-<h3 id="定义GRU"><a href="#定义GRU" class="headerlink" title="定义GRU"></a>定义GRU</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">def gru(inputs, state, params):</span><br><span class="line">    W_xz, W_hz, b_z, W_xr, W_hr, b_r, W_xh, W_hh, b_h, W_hq, b_q = params</span><br><span class="line">    H,  = state</span><br><span class="line">    outputs = []</span><br><span class="line">    for X in inputs:</span><br><span class="line">        R = torch.sigmoid((X @ W_xr) + (H @ W_hr) + b_r)</span><br><span class="line">        Z = torch.sigmoid((X @ W_xz) + (H @ W_hz) + b_z)</span><br><span class="line">        H_tilda = torch.tanh((X @ W_xh) + ((H * R) @ W_hh) + b_h)</span><br><span class="line">        H = Z * H + (1 - Z) * H_tilda</span><br><span class="line">        Y = H @ W_hq + b_q</span><br><span class="line">        outputs.append(Y)</span><br><span class="line">    return torch.cat(outputs, dim=0), (H, )</span><br></pre></td></tr></table></figure>
-<h3 id="torch中的GRU层"><a href="#torch中的GRU层" class="headerlink" title="torch中的GRU层"></a>torch中的GRU层</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gru_layer = nn.GRU(num_inputs, num_hiddens)</span><br></pre></td></tr></table></figure>
+<h1 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h1><h2 id="参数初始化"><a href="#参数初始化" class="headerlink" title="参数初始化"></a>参数初始化</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"># 初始化模型参数</span><br><span class="line">def get_params(vocab_size, num_hiddens, device):</span><br><span class="line">    num_inputs = num_outputs = vocab_size</span><br><span class="line">    </span><br><span class="line">    def normal(shape):</span><br><span class="line">        return torch.randn(size=shape, device=device) * 0.01</span><br><span class="line">    </span><br><span class="line">    def three():</span><br><span class="line">        return (normal((num_inputs, num_hiddens)), </span><br><span class="line">                normal((num_hiddens, num_hiddens)), </span><br><span class="line">                torch.zeros(num_hiddens, device=device))</span><br><span class="line">    </span><br><span class="line">    W_xi, W_hi, b_i = three()</span><br><span class="line">    W_xf, W_hf, b_f = three()</span><br><span class="line">    W_xo, W_ho, b_o = three()</span><br><span class="line">    W_xc, W_hc, b_c = three()</span><br><span class="line">    W_hq = normal((num_hiddens, num_outputs))</span><br><span class="line">    b_q = torch.zeros(num_outputs, device=device)</span><br><span class="line">    params = [W_xi, W_hi, b_i, W_xf, W_hf, b_f, W_xo, W_ho, b_o, W_xc, W_hc, b_c, W_hq, b_q]</span><br><span class="line">    for param in params:</span><br><span class="line">        param.requires_grad_(True)</span><br><span class="line">    return params</span><br></pre></td></tr></table></figure>
+<h2 id="隐状态初始化"><a href="#隐状态初始化" class="headerlink" title="隐状态初始化"></a>隐状态初始化</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">def init_lstm_state(batch_size, num_hiddens, device):</span><br><span class="line">    return (</span><br><span class="line">        torch.zeros((batch_size, num_hiddens), device=device),</span><br><span class="line">        torch.zeros((batch_size, num_hiddens), device=device)</span><br><span class="line">    )</span><br></pre></td></tr></table></figure>
+<h2 id="lstm"><a href="#lstm" class="headerlink" title="lstm"></a>lstm</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">def lstm(inputs, state, params):</span><br><span class="line">    W_xi, W_hi, b_i, W_xf, W_hf, b_f, W_xo, W_ho, b_o, W_xc, W_hc, b_c, W_hq, b_q = params</span><br><span class="line">    (H, C) = state</span><br><span class="line">    outputs = []</span><br><span class="line">    for X in inputs:</span><br><span class="line">        I = torch.sigmoid((X @ W_xi) + (H @ W_hi) + b_i)</span><br><span class="line">        F = torch.sigmoid((X @ W_xf) + (H @ W_hf) + b_f)</span><br><span class="line">        O = torch.sigmoid((X @ W_xo) + (H @ W_ho) + b_o)</span><br><span class="line">        C_tilda = torch.tanh((X @ W_xc) + (H @ W_hc) + b_c)</span><br><span class="line">        C = (F * C) + (I * C_tilda)</span><br><span class="line">        H = O * torch.tanh(C)</span><br><span class="line">        Y = (H @ W_hq) + b_q</span><br><span class="line">        outputs.append(Y)</span><br><span class="line">    return torch.cat(outputs, dim=0), (H, C)</span><br></pre></td></tr></table></figure>
+<h2 id="torch-nn-LSTM"><a href="#torch-nn-LSTM" class="headerlink" title="torch.nn.LSTM"></a>torch.nn.LSTM</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lstm_layer = nn.LSTM(num_inputs, num_hiddens)</span><br></pre></td></tr></table></figure>
+
+
         </div>
 
         
@@ -283,7 +264,7 @@
                 
                     <p class="copyright-item">
                         <span>Permalink:</span>
-                        <span><a href="https://reginald-l.github.io/2022/08/26/GRU/">https://reginald-l.github.io/2022/08/26/GRU/</a></span>
+                        <span><a href="https://reginald-l.github.io/2022/08/28/LSTM/">https://reginald-l.github.io/2022/08/28/LSTM/</a></span>
                     </p>
                 
                 
@@ -311,7 +292,7 @@
                     
                         <a href="/tags/%E5%BE%AA%E7%8E%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/"># 循环神经网络</a>
                     
-                        <a href="/tags/GRU/"># GRU</a>
+                        <a href="/tags/LSTM/"># LSTM</a>
                     
                         
                 </span>
@@ -324,10 +305,8 @@
         </section>
         <section class="post-nav">
             
-                <a class="prev" rel="prev" href="/2022/08/28/LSTM/">LSTM</a>
             
-            
-            <a class="next" rel="next" href="/2022/08/25/%E5%BE%AA%E7%8E%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C-RNN/">循环神经网络(RNN)</a>
+            <a class="next" rel="next" href="/2022/08/26/GRU/">GRU</a>
             
         </section>
 
