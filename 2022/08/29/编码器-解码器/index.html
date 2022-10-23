@@ -13,7 +13,7 @@
 
 
 
-<title>LSTM | Reggie&#39;s blog</title>
+<title>编码器-解码器 | Reggie&#39;s blog</title>
 
 
 
@@ -219,7 +219,7 @@
     
     <article class="post-wrap">
         <header class="post-header">
-            <h1 class="post-title">LSTM</h1>
+            <h1 class="post-title">编码器-解码器</h1>
             
                 <div class="post-meta">
                     
@@ -228,7 +228,7 @@
 
                     
                         <span class="post-time">
-                        Date: <a href="#">August 28, 2022&nbsp;&nbsp;20:36:01</a>
+                        Date: <a href="#">August 29, 2022&nbsp;&nbsp;16:10:42</a>
                         </span>
                     
                     
@@ -237,20 +237,20 @@
         </header>
 
         <div class="post-content">
-            <p>LSTM 它的隐藏层中包含了两个对象: 记忆单元 (memory) 和 隐状态 (hidden state). 两者的形状是一样的, 都是 $(batch\_size, num\_hiddens)$</p>
-<ul>
-<li>忘记门</li>
-<li>输入门</li>
-<li>输出门</li>
+            <ul>
+<li>编码器: 将输入编程成中间表达形式(特征), 比如RNN中将文本表示为向量</li>
+<li>解码器: 将中间表示解码成输出, 比如RNN中京阿尼该向量表示成输出</li>
 </ul>
-<h1 id="LSTM"><a href="#LSTM" class="headerlink" title="LSTM"></a>LSTM</h1><img src="/2022/08/28/LSTM/LSTM.png" class="" title="LSTM">
+<h1 id="编码器-解码器架构"><a href="#编码器-解码器架构" class="headerlink" title="编码器-解码器架构"></a>编码器-解码器架构</h1><ul>
+<li>一个模型能够被分解为两块:<ul>
+<li>编码器处理输入</li>
+<li>解码器生成输出</li>
+</ul>
+</li>
+</ul>
+<img src="/2022/08/29/%E7%BC%96%E7%A0%81%E5%99%A8-%E8%A7%A3%E7%A0%81%E5%99%A8/Encoder-Decoder.png" class="" title="编码器-解码器架构">
 
-<h1 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h1><h2 id="参数初始化"><a href="#参数初始化" class="headerlink" title="参数初始化"></a>参数初始化</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"># 初始化模型参数</span><br><span class="line">def get_params(vocab_size, num_hiddens, device):</span><br><span class="line">    num_inputs = num_outputs = vocab_size</span><br><span class="line">    </span><br><span class="line">    def normal(shape):</span><br><span class="line">        return torch.randn(size=shape, device=device) * 0.01</span><br><span class="line">    </span><br><span class="line">    def three():</span><br><span class="line">        return (normal((num_inputs, num_hiddens)), </span><br><span class="line">                normal((num_hiddens, num_hiddens)), </span><br><span class="line">                torch.zeros(num_hiddens, device=device))</span><br><span class="line">    </span><br><span class="line">    W_xi, W_hi, b_i = three()</span><br><span class="line">    W_xf, W_hf, b_f = three()</span><br><span class="line">    W_xo, W_ho, b_o = three()</span><br><span class="line">    W_xc, W_hc, b_c = three()</span><br><span class="line">    W_hq = normal((num_hiddens, num_outputs))</span><br><span class="line">    b_q = torch.zeros(num_outputs, device=device)</span><br><span class="line">    params = [W_xi, W_hi, b_i, W_xf, W_hf, b_f, W_xo, W_ho, b_o, W_xc, W_hc, b_c, W_hq, b_q]</span><br><span class="line">    for param in params:</span><br><span class="line">        param.requires_grad_(True)</span><br><span class="line">    return params</span><br></pre></td></tr></table></figure>
-<h2 id="隐状态初始化"><a href="#隐状态初始化" class="headerlink" title="隐状态初始化"></a>隐状态初始化</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">def init_lstm_state(batch_size, num_hiddens, device):</span><br><span class="line">    return (</span><br><span class="line">        torch.zeros((batch_size, num_hiddens), device=device),</span><br><span class="line">        torch.zeros((batch_size, num_hiddens), device=device)</span><br><span class="line">    )</span><br></pre></td></tr></table></figure>
-<h2 id="lstm"><a href="#lstm" class="headerlink" title="lstm"></a>lstm</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">def lstm(inputs, state, params):</span><br><span class="line">    W_xi, W_hi, b_i, W_xf, W_hf, b_f, W_xo, W_ho, b_o, W_xc, W_hc, b_c, W_hq, b_q = params</span><br><span class="line">    (H, C) = state</span><br><span class="line">    outputs = []</span><br><span class="line">    for X in inputs:</span><br><span class="line">        I = torch.sigmoid((X @ W_xi) + (H @ W_hi) + b_i)</span><br><span class="line">        F = torch.sigmoid((X @ W_xf) + (H @ W_hf) + b_f)</span><br><span class="line">        O = torch.sigmoid((X @ W_xo) + (H @ W_ho) + b_o)</span><br><span class="line">        C_tilda = torch.tanh((X @ W_xc) + (H @ W_hc) + b_c)</span><br><span class="line">        C = (F * C) + (I * C_tilda)</span><br><span class="line">        H = O * torch.tanh(C)</span><br><span class="line">        Y = (H @ W_hq) + b_q</span><br><span class="line">        outputs.append(Y)</span><br><span class="line">    return torch.cat(outputs, dim=0), (H, C)</span><br></pre></td></tr></table></figure>
-<h2 id="torch-nn-LSTM"><a href="#torch-nn-LSTM" class="headerlink" title="torch.nn.LSTM"></a>torch.nn.LSTM</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lstm_layer = nn.LSTM(num_inputs, num_hiddens)</span><br></pre></td></tr></table></figure>
-
-
+<h1 id="接口代码"><a href="#接口代码" class="headerlink" title="接口代码"></a>接口代码</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">from torch import nn</span><br><span class="line"></span><br><span class="line"># 编码器</span><br><span class="line">class Encoder(nn.Module): </span><br><span class="line">    &quot;&quot;&quot;编码器-解码器架构的基本编码器接⼝&quot;&quot;&quot; </span><br><span class="line">    def __init__(self, **kwargs): </span><br><span class="line">        super(Encoder, self).__init__(**kwargs)</span><br><span class="line"></span><br><span class="line">    def forward(self, X, *args):</span><br><span class="line">        raise NotImplementedError</span><br><span class="line"># 解码器</span><br><span class="line">class Decoder(nn.Module): </span><br><span class="line">    &quot;&quot;&quot;编码器-解码器架构的基本解码器接⼝&quot;&quot;&quot; </span><br><span class="line">    def __init__(self, **kwargs): </span><br><span class="line">        super(Decoder, self).__init__(**kwargs)</span><br><span class="line"></span><br><span class="line">    def init_state(self, enc_outputs, *args): </span><br><span class="line">        raise NotImplementedError</span><br><span class="line"></span><br><span class="line">    def forward(self, X, state):</span><br><span class="line">        raise NotImplementedError</span><br><span class="line"># 合并编码器和解码器</span><br><span class="line">class EncoderDecoder(nn.Module): </span><br><span class="line">    &quot;&quot;&quot;编码器-解码器架构的基类&quot;&quot;&quot; </span><br><span class="line">    def __init__(self, encoder, decoder, **kwargs): </span><br><span class="line">        super(EncoderDecoder, self).__init__(**kwargs) </span><br><span class="line">        self.encoder = encoder </span><br><span class="line">        self.decoder = decoder</span><br><span class="line"></span><br><span class="line">    def forward(self, enc_X, dec_X, *args): </span><br><span class="line">        enc_outputs = self.encoder(enc_X, *args) </span><br><span class="line">        dec_state = self.decoder.init_state(enc_outputs, *args)</span><br><span class="line">        return self.decoder(dec_X, dec_state)</span><br></pre></td></tr></table></figure>
         </div>
 
         
@@ -264,7 +264,7 @@
                 
                     <p class="copyright-item">
                         <span>Permalink:</span>
-                        <span><a href="https://reginald-l.github.io/2022/08/28/LSTM/">https://reginald-l.github.io/2022/08/28/LSTM/</a></span>
+                        <span><a href="https://reginald-l.github.io/2022/08/29/%E7%BC%96%E7%A0%81%E5%99%A8-%E8%A7%A3%E7%A0%81%E5%99%A8/">https://reginald-l.github.io/2022/08/29/%E7%BC%96%E7%A0%81%E5%99%A8-%E8%A7%A3%E7%A0%81%E5%99%A8/</a></span>
                     </p>
                 
                 
@@ -290,10 +290,6 @@
                     
                         <a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"># 深度学习</a>
                     
-                        <a href="/tags/%E5%BE%AA%E7%8E%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/"># 循环神经网络</a>
-                    
-                        <a href="/tags/LSTM/"># LSTM</a>
-                    
                         
                 </span>
             </div>
@@ -305,10 +301,10 @@
         </section>
         <section class="post-nav">
             
-                <a class="prev" rel="prev" href="/2022/08/29/%E7%BC%96%E7%A0%81%E5%99%A8-%E8%A7%A3%E7%A0%81%E5%99%A8/">编码器-解码器</a>
+                <a class="prev" rel="prev" href="/2022/10/21/Self-Attention/">Self-Attention</a>
             
             
-            <a class="next" rel="next" href="/2022/08/26/GRU/">GRU</a>
+            <a class="next" rel="next" href="/2022/08/28/LSTM/">LSTM</a>
             
         </section>
 
