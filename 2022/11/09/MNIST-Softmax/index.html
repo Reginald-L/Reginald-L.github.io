@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Reggie">
+
+
+
+
+
+<title>MNIST_Softmax | Reggie&#39;s blog</title>
+
+
+
+    <link rel="icon" href="/favicon.jpg">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        <!-- MathJax配置，可通过单美元符号书写行内公式等 -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+    "HTML-CSS": {
+        preferredFont: "TeX",
+        availableFonts: ["STIX","TeX"],
+        linebreaks: { automatic:true },
+        EqnChunk: (MathJax.Hub.Browser.isMobile ? 10 : 50)
+    },
+    tex2jax: {
+        inlineMath: [ ["$", "$"], ["\\(","\\)"] ],
+        processEscapes: true,
+        ignoreClass: "tex2jax_ignore|dno",
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        equationNumbers: { autoNumber: "AMS" },
+        noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } },
+        Macros: { href: "{}" }
+    },
+    messageStyle: "none"
+    });
+</script>
+<!-- 给MathJax元素添加has-jax class -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+<!-- 通过连接CDN加载MathJax的js代码 -->
+<script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+
+    
+
+
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Reggie&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Reggie&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6;    // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function () {
+            tocbot.refresh(obj_merge(tocbot_default_config, { hasInnerContainers: true }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function () {
+        tocbot.init(obj_merge(tocbot_default_config, { collapseDepth: 1 }));
+    });
+
+    function expandToc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, { collapseDepth: expanded ? 1 : DEPTH_MAX }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">MNIST_Softmax</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Reggie</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">November 9, 2022&nbsp;&nbsp;11:15:09</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="MNIST分类任务"><a href="#MNIST分类任务" class="headerlink" title="MNIST分类任务"></a>MNIST分类任务</h1><h2 id="结果展示"><a href="#结果展示" class="headerlink" title="结果展示"></a>结果展示</h2><center>
+    <img style="border-radius: 0.3125em;" 
+    src="result.png">
+    <br>
+    <div style="color:orange; display: inline-block; color: black; padding: 2px; font-size:20px;">Softmax_MNIST分类准确率</div>
+</center>
+
+
+<h2 id="导包"><a href="#导包" class="headerlink" title="导包"></a>导包</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">import os</span><br><span class="line">import numpy as np</span><br><span class="line">import pandas as pd</span><br><span class="line">from PIL import Image</span><br><span class="line">import torch</span><br><span class="line">import torchvision</span><br><span class="line">import torch.nn as nn</span><br><span class="line">from matplotlib import pyplot as plt</span><br><span class="line"></span><br><span class="line"># matplotlib显示中文</span><br><span class="line">plt.rcParams[&#x27;font.sans-serif&#x27;] = [&#x27;SimHei&#x27;]  # 用来正常显示中文标签</span><br><span class="line">plt.rcParams[&#x27;axes.unicode_minus&#x27;] = False  # 用来正常显示负号</span><br></pre></td></tr></table></figure>
+
+<h2 id="数据加载"><a href="#数据加载" class="headerlink" title="数据加载"></a>数据加载</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"># 加载MNIST</span><br><span class="line">def load_MNIST(path):</span><br><span class="line">    data_path = os.path.join(path, &#x27;data&#x27;)</span><br><span class="line">    trans = torchvision.transforms.Compose([</span><br><span class="line">        torchvision.transforms.ToTensor()</span><br><span class="line">    ])</span><br><span class="line">    minist_train_dataset = torchvision.datasets.MNIST(root=data_path, train=True, transform=trans, download=True)</span><br><span class="line">    minist_test_dataset = torchvision.datasets.MNIST(root=data_path, train=False, transform=trans, download=True)</span><br><span class="line"></span><br><span class="line">    train_dataloader = torch.utils.data.DataLoader(minist_train_dataset, batch_size=64, shuffle=True)</span><br><span class="line">    test_dataloader = torch.utils.data.DataLoader(minist_test_dataset, batch_size=64, shuffle=True)</span><br><span class="line">    return train_dataloader, test_dataloader</span><br><span class="line"></span><br><span class="line"># 加载自定义CSV数据</span><br><span class="line">def load_dataset(path):</span><br><span class="line">    &#x27;&#x27;&#x27;</span><br><span class="line">    从csv文件中读取数据</span><br><span class="line">    path: 数据所在位置的根目录</span><br><span class="line"></span><br><span class="line">    label    28709 non-null  int64  </span><br><span class="line">    feature  28709 non-null  object </span><br><span class="line">    &#x27;&#x27;&#x27;</span><br><span class="line">    print(&#x27;开始加载数据...&#x27;)</span><br><span class="line">    data_path = os.path.join(path, &#x27;data/train.csv&#x27;)</span><br><span class="line">    emotion_raw_data = pd.read_csv(data_path)</span><br><span class="line">    # 处理features</span><br><span class="line">    raw_features = emotion_raw_data[&#x27;feature&#x27;]</span><br><span class="line">    features = []</span><br><span class="line">    for item in raw_features:</span><br><span class="line">        # item 是 str 类型的数据</span><br><span class="line">        features.append(np.array(item.strip().split(&#x27; &#x27;), dtype=np.float32))</span><br><span class="line">    features = np.array(features) / 255 # (28709, 2304)</span><br><span class="line">    # 处理labels</span><br><span class="line">    labels = np.array(emotion_raw_data[&#x27;label&#x27;], dtype=np.int32) # (28709, )</span><br><span class="line"></span><br><span class="line">    # show_examples(features[0:6].reshape(6, 48, 48), labels[0:6], 6)</span><br><span class="line">    print(&quot;数据加载完成!!!&quot;)</span><br><span class="line">    return features[0:20000], labels[0:20000], features[20000:28710], labels[20000: 28710] </span><br></pre></td></tr></table></figure>
+
+<h2 id="模型定义"><a href="#模型定义" class="headerlink" title="模型定义"></a>模型定义</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">class MySoftmax(nn.Module):</span><br><span class="line">    def __init__(self, num_features, num_out):</span><br><span class="line">        super(MySoftmax, self).__init__()</span><br><span class="line">        self.flat = nn.Flatten()</span><br><span class="line">        self.linear = nn.Linear(num_features, num_out)</span><br><span class="line"></span><br><span class="line">    def forward(self, X):</span><br><span class="line">        return self.linear(self.flat(X))</span><br></pre></td></tr></table></figure>
+<h2 id="模型参数初始化"><a href="#模型参数初始化" class="headerlink" title="模型参数初始化"></a>模型参数初始化</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">def init_weights(m):</span><br><span class="line">    if type(m) == nn.Linear:</span><br><span class="line">        # nn.init.normal_(m.weight, std=0.01)</span><br><span class="line">        nn.init.xavier_normal_(m.weight)</span><br></pre></td></tr></table></figure>
+
+<h2 id="计算准确率"><a href="#计算准确率" class="headerlink" title="计算准确率"></a>计算准确率</h2><p>传入两个labels矩阵, 返回预测正确的个数和labels总个数</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">def accuracy(y_hat, y):</span><br><span class="line">    if len(y_hat) &gt; 1 or y_hat.shape[1] &gt; 1:</span><br><span class="line">        y_hat = torch.argmax(y_hat, dim=1, keepdim=True)</span><br><span class="line">    if y.dim() != 2:</span><br><span class="line">        y = y.reshape(-1, 1)</span><br><span class="line">    cam = y_hat.type(y.dtype) == y</span><br><span class="line">    return float(cam.sum()), y.size().numel()</span><br></pre></td></tr></table></figure>
+
+<h2 id="main"><a href="#main" class="headerlink" title="main"></a>main</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line">if __name__ == &#x27;__main__&#x27;:</span><br><span class="line">    root = os.path.abspath(&#x27;.&#x27;)</span><br><span class="line">    # 数据处理</span><br><span class="line">    # features, labels, test_features, test_labels = load_dataset(root)</span><br><span class="line">    # features, labels = torch.tensor(features, dtype=torch.float32), torch.tensor(labels, dtype=torch.long)</span><br><span class="line">    # test_features, test_labels = torch.tensor(test_features, dtype=torch.float32), torch.tensor(test_labels, dtype=torch.long)</span><br><span class="line"></span><br><span class="line">    num_features, num_labels = 28 * 28, 10</span><br><span class="line">    train_dataloader, test_dataloader = load_MNIST(root)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    # 构建模型 - softmax回归</span><br><span class="line">    net = MySoftmax(num_features, num_labels)</span><br><span class="line">    # net = nn.Sequential(nn.Flatten(), nn.Linear(num_features, num_labels))</span><br><span class="line">    # 模型初始化</span><br><span class="line">    net.apply(init_weights)</span><br><span class="line">    # loss</span><br><span class="line">    loss = nn.CrossEntropyLoss()</span><br><span class="line">    # optimiser</span><br><span class="line">    learning_rate = 0.0005</span><br><span class="line">    optimiser = torch.optim.Adam(net.parameters(), lr=learning_rate)</span><br><span class="line">    # train</span><br><span class="line">    num_epochs = 50</span><br><span class="line">    loss_changes = []</span><br><span class="line">    for epoch in range(num_epochs):</span><br><span class="line">        for X, y in train_dataloader:</span><br><span class="line">            y_hat = net(X)</span><br><span class="line">            # print(f&#x27;y_hat.shape = &#123;y_hat.shape&#125; \t labels.shape = &#123;labels.shape&#125;&#x27;)</span><br><span class="line">            l = loss(y_hat, y)</span><br><span class="line">            optimiser.zero_grad()</span><br><span class="line">            l.backward()</span><br><span class="line">            optimiser.step()</span><br><span class="line"></span><br><span class="line">        if epoch % 10 == 0:</span><br><span class="line">            print(f&#x27;epoch: &#123;epoch + 1&#125; \ &#123;num_epochs&#125; \t loss: &#123;l.item():.6f&#125;&#x27;)</span><br><span class="line">            loss_changes.append(l.item())</span><br><span class="line">    </span><br><span class="line">    draw_changes(loss_changes, list(range(0, num_epochs, 10)), &#x27;cost_changes&#x27;)</span><br><span class="line">    </span><br><span class="line">    with torch.no_grad():</span><br><span class="line">        train_true_num, b_train_size = 0.0, 0.0</span><br><span class="line">        for train_X, train_y in train_dataloader:</span><br><span class="line">            y_train_pred = net(train_X)</span><br><span class="line">            pre_true, b_size = accuracy(y_train_pred, train_y)</span><br><span class="line">            train_true_num += pre_true</span><br><span class="line">            b_train_size += b_size</span><br><span class="line">        </span><br><span class="line">        print(f&#x27;train_acc = &#123;train_true_num / b_train_size * 100 : .2f&#125; %&#x27;)</span><br><span class="line">        </span><br><span class="line">        test_true_num, b_test_size = 0.0, 0.0</span><br><span class="line">        for test_X, test_y in test_dataloader:</span><br><span class="line">            y_test_pred = net(test_X)</span><br><span class="line">            pre_t_true, b_t_size = accuracy(y_test_pred, test_y)</span><br><span class="line">            test_true_num += pre_t_true</span><br><span class="line">            b_test_size += b_t_size</span><br><span class="line"></span><br><span class="line">        print(f&#x27;test_acc = &#123;test_true_num / b_test_size * 100 : .2f&#125; %&#x27;)</span><br></pre></td></tr></table></figure>
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Reggie</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://reginald-l.github.io/2022/11/09/MNIST-Softmax/">https://reginald-l.github.io/2022/11/09/MNIST-Softmax/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2022 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span><strong>I am a slow walker, but I never walk backwards!!!</strong></span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"># 深度学习</a>
+                    
+                        <a href="/tags/Softmax/"># Softmax</a>
+                    
+                        <a href="/tags/MNIST%E5%88%86%E7%B1%BB/"># MNIST分类</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+            <a class="next" rel="next" href="/2022/11/07/%E6%BF%80%E6%B4%BB%E5%87%BD%E6%95%B0/">激活函数</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span> Copyright © Reggie | 2022 </span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>
