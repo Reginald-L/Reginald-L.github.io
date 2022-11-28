@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Reggie">
+
+
+
+
+
+<title>Food_Classification | Reggie&#39;s blog</title>
+
+
+
+    <link rel="icon" href="/favicon.jpg">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        <!-- MathJax配置，可通过单美元符号书写行内公式等 -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+    "HTML-CSS": {
+        preferredFont: "TeX",
+        availableFonts: ["STIX","TeX"],
+        linebreaks: { automatic:true },
+        EqnChunk: (MathJax.Hub.Browser.isMobile ? 10 : 50)
+    },
+    tex2jax: {
+        inlineMath: [ ["$", "$"], ["\\(","\\)"] ],
+        processEscapes: true,
+        ignoreClass: "tex2jax_ignore|dno",
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        equationNumbers: { autoNumber: "AMS" },
+        noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } },
+        Macros: { href: "{}" }
+    },
+    messageStyle: "none"
+    });
+</script>
+<!-- 给MathJax元素添加has-jax class -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+<!-- 通过连接CDN加载MathJax的js代码 -->
+<script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+
+    
+
+
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Reggie&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Reggie&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6;    // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function () {
+            tocbot.refresh(obj_merge(tocbot_default_config, { hasInnerContainers: true }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function () {
+        tocbot.init(obj_merge(tocbot_default_config, { collapseDepth: 1 }));
+    });
+
+    function expandToc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, { collapseDepth: expanded ? 1 : DEPTH_MAX }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">Food_Classification</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Reggie</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">November 28, 2022&nbsp;&nbsp;14:37:51</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="任务描述"><a href="#任务描述" class="headerlink" title="任务描述"></a>任务描述</h1><p>对食物图像进行分类</p>
+<h1 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h1><h2 id="数据集"><a href="#数据集" class="headerlink" title="数据集"></a>数据集</h2><p>自定义数据集继承自PyTorch中的Dataset, 其中需要重写两个函数: <code>__len__()</code> 和 <code>__getitem__()</code>. 其中</p>
+<ul>
+<li><code> __len__ (self)</code> 函数返回数据集的大小</li>
+<li><code>__getitem__(self, idx)</code> 函数返回 <code>idx</code> 索引的图像(img)和类别(class)<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">import os</span><br><span class="line">from PIL import Image</span><br><span class="line">import torchvision.transforms as transform</span><br><span class="line">from torch.utils.data import Dataset</span><br><span class="line"></span><br><span class="line">class FoodDataset(Dataset):</span><br><span class="line">    def __init__(self, path, tfm=None, files = None):</span><br><span class="line">        super().__init__()</span><br><span class="line">        self.path = path</span><br><span class="line">        self.files = sorted([os.path.join(path,x) for x in os.listdir(path) if x.endswith(&quot;.jpg&quot;)])</span><br><span class="line">        if files != None:</span><br><span class="line">            self.files = files</span><br><span class="line">        print(f&quot;One &#123;path&#125; sample&quot;,self.files[0])</span><br><span class="line">        self.transform = tfm</span><br><span class="line">  </span><br><span class="line">    def __len__(self):</span><br><span class="line">        return len(self.files)</span><br><span class="line">  </span><br><span class="line">    def __getitem__(self,idx):</span><br><span class="line">        fname = self.files[idx]</span><br><span class="line">        im = Image.open(fname)</span><br><span class="line">        im = self.transform(im)</span><br><span class="line">        try:</span><br><span class="line">            label = int(fname.split(&quot;\\&quot;)[-1].split(&quot;_&quot;)[0])</span><br><span class="line">        except:</span><br><span class="line">            label = -1 # test has no label</span><br><span class="line">        return im,label</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="模型实现"><a href="#模型实现" class="headerlink" title="模型实现"></a>模型实现</h2><h3 id="自定义CNN模型"><a href="#自定义CNN模型" class="headerlink" title="自定义CNN模型"></a>自定义CNN模型</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line">import torch</span><br><span class="line">from torch import nn as nn</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">class Classifier(nn.Module):</span><br><span class="line">    def __init__(self):</span><br><span class="line">        super(Classifier, self).__init__()</span><br><span class="line">        # torch.nn.Conv2d(in_channels, out_channels, kernel_size, stride, padding)</span><br><span class="line">        # torch.nn.MaxPool2d(kernel_size, stride, padding)</span><br><span class="line">        # input 維度 [3, 128, 128]</span><br><span class="line">        self.cnn = nn.Sequential(</span><br><span class="line">            nn.Conv2d(3, 64, 3, 1, 1),  # [64, 128, 128]</span><br><span class="line">            nn.BatchNorm2d(64),</span><br><span class="line">            nn.ReLU(),</span><br><span class="line">            nn.MaxPool2d(2, 2, 0),      # [64, 64, 64]</span><br><span class="line"></span><br><span class="line">            nn.Conv2d(64, 128, 3, 1, 1), # [128, 64, 64]</span><br><span class="line">            nn.BatchNorm2d(128),</span><br><span class="line">            nn.ReLU(),</span><br><span class="line">            nn.MaxPool2d(2, 2, 0),      # [128, 32, 32]</span><br><span class="line"></span><br><span class="line">            nn.Conv2d(128, 256, 3, 1, 1), # [256, 32, 32]</span><br><span class="line">            nn.BatchNorm2d(256),</span><br><span class="line">            nn.ReLU(),</span><br><span class="line">            nn.MaxPool2d(2, 2, 0),      # [256, 16, 16]</span><br><span class="line"></span><br><span class="line">            nn.Conv2d(256, 512, 3, 1, 1), # [512, 16, 16]</span><br><span class="line">            nn.BatchNorm2d(512),</span><br><span class="line">            nn.ReLU(),</span><br><span class="line">            nn.MaxPool2d(2, 2, 0),       # [512, 8, 8]</span><br><span class="line">            </span><br><span class="line">            nn.Conv2d(512, 512, 3, 1, 1), # [512, 8, 8]</span><br><span class="line">            nn.BatchNorm2d(512),</span><br><span class="line">            nn.ReLU(),</span><br><span class="line">            nn.MaxPool2d(2, 2, 0),       # [512, 4, 4]</span><br><span class="line">        )</span><br><span class="line">        self.fc = nn.Sequential(</span><br><span class="line">            nn.Flatten(),</span><br><span class="line">            nn.Linear(8192, 1024),</span><br><span class="line">            nn.ReLU(),</span><br><span class="line">            nn.Linear(1024, 512),</span><br><span class="line">            nn.ReLU(),</span><br><span class="line">            nn.Linear(512, 11)</span><br><span class="line">        )</span><br><span class="line">    </span><br><span class="line">    def forward(self, X):</span><br><span class="line">        out = self.cnn(X)</span><br><span class="line">        out = self.fc(out)</span><br><span class="line">        return out</span><br></pre></td></tr></table></figure>
+<h3 id="VGG"><a href="#VGG" class="headerlink" title="VGG"></a>VGG</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">class VGG(nn.Module):</span><br><span class="line">    def __init__(self, vgg_arch:list):</span><br><span class="line">        super().__init__()</span><br><span class="line">        self.in_channels = 3</span><br><span class="line">        self.vgg = nn.Sequential()</span><br><span class="line">        for item in vgg_arch:</span><br><span class="line">            print(f&#x27;num = &#123;item[0]&#125; /t in = &#123;self.in_channels&#125; /t out = &#123;item[1]&#125;&#x27;)</span><br><span class="line">            vblock = VGG_block(item[0], self.in_channels, item[1])</span><br><span class="line">            self.vgg.append(vblock)</span><br><span class="line">            self.in_channels = item[1]</span><br><span class="line">        </span><br><span class="line">        self.fc = nn.Sequential(</span><br><span class="line">            nn.Flatten(),</span><br><span class="line">            nn.Linear(512 * 7 * 7, 4096),</span><br><span class="line">            nn.ReLU(),</span><br><span class="line">            nn.Dropout(),</span><br><span class="line">            nn.Linear(4096, 4096),</span><br><span class="line">            nn.ReLU(),</span><br><span class="line">            nn.Dropout(),</span><br><span class="line">            nn.Linear(4096, 1000)</span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">    def forward(self, X):</span><br><span class="line">        out = self.vgg(X)</span><br><span class="line">        out = self.fc(out)</span><br><span class="line">        return out</span><br><span class="line"></span><br><span class="line">def VGG_block(num_convs, in_channels, out_channels):</span><br><span class="line">    block = nn.Sequential()</span><br><span class="line">    for i in range(num_convs):</span><br><span class="line">        conv = nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=3, padding=1)</span><br><span class="line">        block.add_module(&#x27;conv_%d&#x27;%(i), conv)</span><br><span class="line">        block.add_module(&#x27;relu&#x27;, nn.ReLU())</span><br><span class="line">        in_channels = out_channels</span><br><span class="line">    block.add_module(&#x27;Max_pool&#x27;, nn.MaxPool2d(kernel_size=2, stride=2))</span><br><span class="line">    return block</span><br><span class="line"></span><br><span class="line">vgg_arch = [(1, 64), (1, 128), (2, 256), (2, 512), (2, 512)] # VGG-11</span><br></pre></td></tr></table></figure>
+<h3 id="AlexNet"><a href="#AlexNet" class="headerlink" title="AlexNet"></a>AlexNet</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">class AlexNet(nn.Module):</span><br><span class="line">    &#x27;&#x27;&#x27;</span><br><span class="line">    input shape = [3, 224, 224]</span><br><span class="line">    &#x27;&#x27;&#x27;</span><br><span class="line">    def __init__(self):</span><br><span class="line">        super().__init__()</span><br><span class="line">        self.cnn = nn.Sequential(</span><br><span class="line">            nn.Conv2d(in_channels=3, out_channels=96, kernel_size=11, stride=4), # [96, 54, 54]</span><br><span class="line">            nn.ReLU(),</span><br><span class="line">            nn.MaxPool2d(kernel_size=3, stride=2), # [96, 26, 26]</span><br><span class="line"></span><br><span class="line">            nn.Conv2d(in_channels=96, out_channels=256, kernel_size=5, padding=2), # [256, 26, 26]</span><br><span class="line">            nn.ReLU(),</span><br><span class="line">            nn.MaxPool2d(kernel_size=3, stride=2), # [256, 12, 12]</span><br><span class="line"></span><br><span class="line">            nn.Conv2d(in_channels=256, out_channels=384, kernel_size=3, padding=1), # [384, 12, 12]</span><br><span class="line">            nn.ReLU(),</span><br><span class="line">            nn.Conv2d(in_channels=384, out_channels=384, kernel_size=3, padding=1), # [384, 12, 12]</span><br><span class="line">            nn.ReLU(),</span><br><span class="line">            nn.Conv2d(in_channels=384, out_channels=384, kernel_size=3, padding=1), # [384, 12, 12]</span><br><span class="line">            nn.ReLU(),</span><br><span class="line"></span><br><span class="line">            nn.MaxPool2d(kernel_size=3, stride=2), # [384, 5, 5]</span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">        self.fc = nn.Sequential(</span><br><span class="line">            nn.Flatten(),</span><br><span class="line">            nn.Linear(384 * 5 * 5, 4096),</span><br><span class="line">            nn.ReLU(),</span><br><span class="line">            nn.Dropout(),</span><br><span class="line">            nn.Linear(4096, 4096),</span><br><span class="line">            nn.ReLU(),</span><br><span class="line">            nn.Dropout(),</span><br><span class="line">            nn.Linear(4096, 1000)</span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">    def forward(self, X):</span><br><span class="line">        out = self.cnn(X)</span><br><span class="line">        out = self.fc(out)</span><br><span class="line">        return out</span><br></pre></td></tr></table></figure>
+<h3 id="GoogleNet"><a href="#GoogleNet" class="headerlink" title="GoogleNet"></a>GoogleNet</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br></pre></td><td class="code"><pre><span class="line">class GoogleNet(nn.Module):</span><br><span class="line">    def __init__(self):</span><br><span class="line">        super().__init__()</span><br><span class="line">        self.stage1 = nn.Sequential(</span><br><span class="line">            nn.Conv2d(in_channels=3, out_channels=64, kernel_size=7, stride=2, padding=3),</span><br><span class="line">            nn.ReLU(),</span><br><span class="line">            nn.MaxPool2d(kernel_size=3, padding=1, stride=2)</span><br><span class="line">        )</span><br><span class="line">        self.stage2 = nn.Sequential(</span><br><span class="line">            nn.Conv2d(in_channels=64, out_channels=64, kernel_size=1),</span><br><span class="line">            nn.ReLU(),</span><br><span class="line">            nn.Conv2d(in_channels=64, out_channels=192, kernel_size=3, padding=1), </span><br><span class="line">            nn.ReLU(),</span><br><span class="line">            nn.MaxPool2d(kernel_size=3, stride=2, padding=1)</span><br><span class="line">        )</span><br><span class="line">        self.stage3 = nn.Sequential(</span><br><span class="line">            InceptionBlock(192, c1=64, c2=(96, 128), c3=(16, 32), c4=32),</span><br><span class="line">            InceptionBlock(256, c1=128, c2=(128, 192), c3=(32, 96), c4=64),</span><br><span class="line">            nn.MaxPool2d(kernel_size=3, stride=2, padding=1)</span><br><span class="line">        )</span><br><span class="line">        self.stage4 = nn.Sequential(</span><br><span class="line">            InceptionBlock(480, c1=192, c2=(96, 208), c3=(16, 48), c4=64),</span><br><span class="line">            InceptionBlock(512, c1=160, c2=(112, 224), c3=(24, 64), c4=64),</span><br><span class="line">            InceptionBlock(512, c1=128, c2=(128, 256), c3=(24, 64), c4=64),</span><br><span class="line">            InceptionBlock(512, c1=112, c2=(114, 288), c3=(32, 64), c4=64),</span><br><span class="line">            InceptionBlock(528, c1=256, c2=(160, 320), c3=(32, 128), c4=128),</span><br><span class="line">            nn.MaxPool2d(kernel_size=3, stride=2, padding=1)</span><br><span class="line">        )</span><br><span class="line">        self.stage5 = nn.Sequential(</span><br><span class="line">            InceptionBlock(832, c1=256, c2=(160, 320), c3=(32, 128), c4=128),</span><br><span class="line">            InceptionBlock(832, c1=384, c2=(192, 384), c3=(48, 128), c4=128),</span><br><span class="line">            nn.AdaptiveAvgPool2d((1, 1)),</span><br><span class="line">            nn.Flatten()</span><br><span class="line">        )</span><br><span class="line">        self.stage6 = nn.Linear(1024, 10)</span><br><span class="line"></span><br><span class="line">    def forward(self, X):</span><br><span class="line">        st1_res =  self.stage1(X)</span><br><span class="line">        st2_res = self.stage2(st1_res)</span><br><span class="line">        st3_res = self.stage3(st2_res)</span><br><span class="line">        st4_res = self.stage4(st3_res)</span><br><span class="line">        st5_res = self.stage5(st4_res)</span><br><span class="line">        return self.stage6(st5_res)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">class InceptionBlock(nn.Module):</span><br><span class="line">    def __init__(self, in_channels, c1, c2, c3, c4):</span><br><span class="line">        super().__init__()</span><br><span class="line">        # 第一条通道</span><br><span class="line">        p1_1 = nn.Conv2d(in_channels=in_channels, out_channels=c1, kernel_size=1)</span><br><span class="line">        self.p1 = nn.Sequential(</span><br><span class="line">            p1_1, nn.ReLU()    </span><br><span class="line">        )</span><br><span class="line">        # 第二条通道</span><br><span class="line">        p2_1 = nn.Conv2d(in_channels=in_channels, out_channels=c2[0], kernel_size=1)</span><br><span class="line">        p2_2 = nn.Conv2d(in_channels=c2[0], out_channels=c2[1], kernel_size=3, padding=1)</span><br><span class="line">        self.p2 = nn.Sequential(</span><br><span class="line">            p2_1, nn.ReLU(),</span><br><span class="line">            p2_2, nn.ReLU()</span><br><span class="line">        )</span><br><span class="line">        # 第三条通道</span><br><span class="line">        p3_1 = nn.Conv2d(in_channels=in_channels, out_channels=c3[0], kernel_size=1)</span><br><span class="line">        p3_2 = nn.Conv2d(in_channels=c3[0], out_channels=c3[1], kernel_size=5, padding=2)</span><br><span class="line">        self.p3 = nn.Sequential(</span><br><span class="line">            p3_1, nn.ReLU(),</span><br><span class="line">            p3_2, nn.ReLU()</span><br><span class="line">        )</span><br><span class="line">        # 第四条通道</span><br><span class="line">        p4_1 = nn.MaxPool2d(kernel_size=3, stride=1, padding=1)</span><br><span class="line">        p4_2 = nn.Conv2d(in_channels=in_channels, out_channels=c4, kernel_size=1)</span><br><span class="line">        self.p4 = nn.Sequential(</span><br><span class="line">            p4_1,</span><br><span class="line">            p4_2, nn.ReLU()</span><br><span class="line">        )</span><br><span class="line">    </span><br><span class="line">    def forward(self, X):</span><br><span class="line">        p1_res = self.p1(X)</span><br><span class="line">        print(f&#x27;p1_res.shape = &#123;p1_res.shape&#125;&#x27;)</span><br><span class="line">        p2_res = self.p2(X)</span><br><span class="line">        print(f&#x27;p2_res.shape = &#123;p2_res.shape&#125;&#x27;)</span><br><span class="line">        p3_res = self.p3(X)</span><br><span class="line">        print(f&#x27;p3_res.shape = &#123;p3_res.shape&#125;&#x27;)</span><br><span class="line">        p4_res = self.p4(X)</span><br><span class="line">        print(f&#x27;p4_res.shape = &#123;p4_res.shape&#125;&#x27;)</span><br><span class="line">        return torch.cat((p1_res, p2_res, p3_res, p4_res), dim=1)</span><br></pre></td></tr></table></figure>
+<h3 id="ResNet"><a href="#ResNet" class="headerlink" title="ResNet"></a>ResNet</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line">class ResNet(nn.Module):</span><br><span class="line">    def __init__(self):</span><br><span class="line">        super().__init__()</span><br><span class="line">        self.stage1 = nn.Sequential(</span><br><span class="line">            nn.Conv2d(in_channels=3, out_channels=64, kernel_size=7, padding=1, stride=1),</span><br><span class="line">            nn.BatchNorm2d(64),</span><br><span class="line">            nn.ReLU(),</span><br><span class="line">            nn.MaxPool2d(kernel_size=3, stride=2)</span><br><span class="line">        )</span><br><span class="line">        self.stage2 = ResNetBlcok(2, 64, 64, strides=1, addition=False)</span><br><span class="line">        self.stage3 = ResNetBlcok(2, 64, 128, strides=2, addition=True)</span><br><span class="line">        self.stage4 = ResNetBlcok(2, 128, 256, strides=2, addition=True)</span><br><span class="line">        self.stage5 = ResNetBlcok(2, 256, 512, strides=2, addition=True)</span><br><span class="line">        self.stage6 = nn.Sequential(</span><br><span class="line">            nn.AdaptiveAvgPool2d((1, 1)),</span><br><span class="line">            nn.Flatten(),</span><br><span class="line">            nn.Linear(512, 10)</span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">    def forward(self, X):</span><br><span class="line">        out = self.stage1(X)</span><br><span class="line">        out = self.stage2(out)</span><br><span class="line">        out = self.stage3(out)</span><br><span class="line">        out = self.stage4(out)</span><br><span class="line">        out = self.stage5(out)</span><br><span class="line">        out = self.stage6(out)</span><br><span class="line">        return out</span><br><span class="line"></span><br><span class="line">class ResNetBlcok(nn.Module):</span><br><span class="line">    def __init__(self, num_res_blocs, in_channels, out_channels, strides=1, addition=False):</span><br><span class="line">        super().__init__()</span><br><span class="line">        self.addition = addition</span><br><span class="line">        self.num_res_blocs = num_res_blocs</span><br><span class="line">        self.block = nn.Sequential(</span><br><span class="line">            nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=3, stride=strides, padding=1),</span><br><span class="line">            nn.BatchNorm2d(out_channels),</span><br><span class="line">            nn.ReLU(),</span><br><span class="line">            nn.Conv2d(in_channels=out_channels, out_channels=out_channels, kernel_size=3, stride=1, padding=1),</span><br><span class="line">            nn.BatchNorm2d(out_channels)</span><br><span class="line">        )</span><br><span class="line">        self.add_layer = nn.Sequential(</span><br><span class="line">            nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=1, stride=strides, padding=0),</span><br><span class="line">            nn.BatchNorm2d(out_channels)</span><br><span class="line">        )</span><br><span class="line">    def forward(self, X):</span><br><span class="line">        for i in range(self.num_res_blocs):</span><br><span class="line">            if i == 0 and self.addition:</span><br><span class="line">                add_out = self.add_layer(X)</span><br><span class="line">                out = self.block(X) + add_out</span><br><span class="line">                self.addition = False</span><br><span class="line">            else:</span><br><span class="line">                out = self.block(X)</span><br><span class="line">        out = F.relu(out)</span><br><span class="line">        return out</span><br></pre></td></tr></table></figure>
+<h2 id="模型训练"><a href="#模型训练" class="headerlink" title="模型训练"></a>模型训练</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br></pre></td><td class="code"><pre><span class="line">from models.Classifier import Classifier</span><br><span class="line">from load_data import FoodDataset</span><br><span class="line"></span><br><span class="line">import torch</span><br><span class="line">from torch import nn</span><br><span class="line">import torchvision</span><br><span class="line">from torch.utils.data import DataLoader</span><br><span class="line">from torchvision import transforms as transform</span><br><span class="line">from tqdm.auto import tqdm</span><br><span class="line"></span><br><span class="line">import matplotlib.pyplot as plt</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def buildDataLoader(train_path, test_path, valid_path, batch_size):</span><br><span class="line">    train_trans = transform.Compose([</span><br><span class="line">        transform.Resize((128, 128)),</span><br><span class="line">        transform.RandomHorizontalFlip(),</span><br><span class="line">        transform.RandomHorizontalFlip(),</span><br><span class="line">        transform.RandomPerspective(),</span><br><span class="line">        transform.ToTensor(),</span><br><span class="line">        transform.RandomErasing(),</span><br><span class="line">        transform.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229,0.224,0.225])</span><br><span class="line">    ])</span><br><span class="line">    test_trans = transform.Compose([</span><br><span class="line">        transform.Resize((128, 128)),</span><br><span class="line">        transform.ToTensor(),</span><br><span class="line">        transform.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229,0.224,0.225])</span><br><span class="line">    ])</span><br><span class="line">    train_dataset = FoodDataset(train_path, tfm=train_trans)</span><br><span class="line">    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, pin_memory=True)</span><br><span class="line"></span><br><span class="line">    valid_dataset = FoodDataset(valid_path, tfm=test_trans)</span><br><span class="line">    valid_loader = DataLoader(valid_dataset, batch_size=batch_size, shuffle=True, pin_memory=True)</span><br><span class="line"></span><br><span class="line">    test_dataset = FoodDataset(test_path, tfm=test_trans)</span><br><span class="line">    test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=True, pin_memory=True)</span><br><span class="line">    return train_loader, valid_loader, test_loader</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def try_gpu(i=0):</span><br><span class="line">    if torch.cuda.device_count() &gt;= (i + 1):</span><br><span class="line">        return torch.device(f&#x27;cuda:&#123;i&#125;&#x27;)</span><br><span class="line">    return torch.device(&#x27;cpu&#x27;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def accuracy(y_hat, y):</span><br><span class="line">    y_hat, y = y_hat.cpu(), y.cpu()</span><br><span class="line">    if len(y_hat.shape) &gt; 1 and y_hat.shape[1] &gt; 1:</span><br><span class="line">        y_hat = y_hat.argmax(axis=1)</span><br><span class="line">    cam = y_hat.type(y.dtype) == y</span><br><span class="line">    return float(cam.type(y.dtype).sum())</span><br><span class="line"></span><br><span class="line">def validation(net, epoch, valid_loader, loss):</span><br><span class="line">    valid_loss = []</span><br><span class="line">    valid_acc = 0.0</span><br><span class="line">    valid_examples = 0</span><br><span class="line">    for X, y in tqdm(valid_loader):</span><br><span class="line">        X, y = X.cuda(try_gpu()), y.cuda(try_gpu())</span><br><span class="line">        y_hat = net(X)</span><br><span class="line">        l = loss(y_hat, y)</span><br><span class="line">        valid_loss.append(l.item())</span><br><span class="line">        acc = accuracy(y_hat, y)</span><br><span class="line">        valid_acc += acc</span><br><span class="line">        valid_examples += y.cpu().numel()</span><br><span class="line">    valid_loss_res = sum(valid_loss) / len(valid_loss)</span><br><span class="line">    valid_acc_res = valid_acc / valid_examples</span><br><span class="line">    print(f&#x27;epoch: &#123;epoch + 1&#125; valid_loss: &#123;float(valid_loss_res):.6f&#125; valid_acc: &#123;float(valid_acc_res * 100):.2f&#125;%&#x27;)</span><br><span class="line">    return valid_acc_res</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def train(net, train_iter, valid_loader, loss, optimiser, num_epochs):</span><br><span class="line">    net = net.cuda(try_gpu())</span><br><span class="line">    net.train()</span><br><span class="line">    patience = 10</span><br><span class="line">    best_acc = 0</span><br><span class="line">    for epoch in range(num_epochs):</span><br><span class="line">        train_loss = []</span><br><span class="line">        train_acc = 0.0</span><br><span class="line">        train_examples = 0</span><br><span class="line">        for X, y in tqdm(train_iter):</span><br><span class="line">            X, y = X.cuda(try_gpu()), y.cuda(try_gpu())</span><br><span class="line">            y_hat = net(X)</span><br><span class="line">            l = loss(y_hat, y)</span><br><span class="line">            optimiser.zero_grad()</span><br><span class="line">            l.backward()</span><br><span class="line">            grad_norm = nn.utils.clip_grad_norm_(net.parameters(), max_norm=10)</span><br><span class="line">            optimiser.step()</span><br><span class="line">            # 计算这个Batch的准确率</span><br><span class="line">            acc = accuracy(y_hat, y)</span><br><span class="line">            # print(f&#x27;预测正确的个数: &#123;acc&#125;&#x27;)</span><br><span class="line">            train_acc += acc</span><br><span class="line">            train_examples += y.cpu().numel()</span><br><span class="line">            # print(f&#x27;训练样本个数: &#123;train_examples&#125;&#x27;)</span><br><span class="line">            # 计算这个Batch的损失</span><br><span class="line">            train_loss.append(l.item())</span><br><span class="line">        </span><br><span class="line">        epoch_loss = sum(train_loss) / len(train_loss)</span><br><span class="line">        epoch_acc = train_acc / train_examples</span><br><span class="line">        </span><br><span class="line">        print(f&#x27;epoch: &#123;epoch + 1&#125; loss: &#123;float(epoch_loss):.6f&#125; acc: &#123;float(epoch_acc * 100):.2f&#125;%&#x27;)</span><br><span class="line"></span><br><span class="line">        # validation</span><br><span class="line">        net.eval()</span><br><span class="line"></span><br><span class="line">        valid_acc = validation(net, epoch, valid_loader, loss)</span><br><span class="line">        # save models</span><br><span class="line">        if valid_acc &gt; best_acc:</span><br><span class="line">            print(f&quot;Best model found at epoch &#123;epoch&#125;, saving model&quot;)</span><br><span class="line">            torch.save(net.state_dict(), &quot;classification_best.ckpt&quot;) # only save best to prevent output memory exceed error</span><br><span class="line">            best_acc = valid_acc</span><br><span class="line">            stale = 0</span><br><span class="line">        else:</span><br><span class="line">            stale += 1</span><br><span class="line">            if stale &gt; patience:</span><br><span class="line">                print(f&quot;No improvment &#123;patience&#125; consecutive epochs, early stopping&quot;)</span><br><span class="line">                break</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">def init_weight(m):</span><br><span class="line">    if type(m) == nn.Conv2d:</span><br><span class="line">        nn.init.xavier_normal_(m.weight)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">if __name__ == &#x27;__main__&#x27;:</span><br><span class="line">    net = Classifier()</span><br><span class="line">    net.apply(init_weight)</span><br><span class="line">    train_path = &#x27;data/food-11/training&#x27;</span><br><span class="line">    test_path = &#x27;data/food-11/testing&#x27;</span><br><span class="line">    valid_path = &#x27;data/food-11/validation&#x27;</span><br><span class="line">    batch_size = 200</span><br><span class="line">    train_loader, valid_loader, test_loader = buildDataLoader(train_path, test_path, valid_path, batch_size)</span><br><span class="line">    loss = nn.CrossEntropyLoss()</span><br><span class="line">    lr = 1e-1</span><br><span class="line">    optimiser = torch.optim.SGD(net.parameters(), lr=lr)</span><br><span class="line">    expLR = torch.optim.lr_scheduler.ExponentialLR(optimiser, gamma=0.98)</span><br><span class="line">    num_epochs = 50</span><br><span class="line">    train(net, train_loader, valid_loader, loss, optimiser, num_epochs)</span><br></pre></td></tr></table></figure>
+
+<h1 id="结果展示"><a href="#结果展示" class="headerlink" title="结果展示"></a>结果展示</h1><img src="/2022/11/28/Food-Classification/results_classification.png" class="" title="训练结果">
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Reggie</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://reginald-l.github.io/2022/11/28/Food-Classification/">https://reginald-l.github.io/2022/11/28/Food-Classification/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2022 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span><strong>I am a slow walker, but I never walk backwards!!!</strong></span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"># 深度学习</a>
+                    
+                        <a href="/tags/%E5%88%86%E7%B1%BB%E4%BB%BB%E5%8A%A1/"># 分类任务</a>
+                    
+                        <a href="/tags/Food-Classification/"># Food Classification</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+            <a class="next" rel="next" href="/2022/11/23/Torchvision%E6%95%B0%E6%8D%AE%E5%A2%9E%E5%BC%BA/">Torchvision数据增强</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span> Copyright © Reggie | 2022 </span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>
