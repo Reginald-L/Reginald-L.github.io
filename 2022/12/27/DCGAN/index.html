@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Reggie">
+
+
+
+
+
+<title>DCGAN | Reggie&#39;s blog</title>
+
+
+
+    <link rel="icon" href="/favicon.jpg">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        <!-- MathJax配置，可通过单美元符号书写行内公式等 -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+    "HTML-CSS": {
+        preferredFont: "TeX",
+        availableFonts: ["STIX","TeX"],
+        linebreaks: { automatic:true },
+        EqnChunk: (MathJax.Hub.Browser.isMobile ? 10 : 50)
+    },
+    tex2jax: {
+        inlineMath: [ ["$", "$"], ["\\(","\\)"] ],
+        processEscapes: true,
+        ignoreClass: "tex2jax_ignore|dno",
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        equationNumbers: { autoNumber: "AMS" },
+        noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } },
+        Macros: { href: "{}" }
+    },
+    messageStyle: "none"
+    });
+</script>
+<!-- 给MathJax元素添加has-jax class -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+<!-- 通过连接CDN加载MathJax的js代码 -->
+<script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+
+    
+
+
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Reggie&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Reggie&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6;    // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function () {
+            tocbot.refresh(obj_merge(tocbot_default_config, { hasInnerContainers: true }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function () {
+        tocbot.init(obj_merge(tocbot_default_config, { collapseDepth: 1 }));
+    });
+
+    function expandToc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, { collapseDepth: expanded ? 1 : DEPTH_MAX }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">DCGAN</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Reggie</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">December 27, 2022&nbsp;&nbsp;17:21:15</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="深度卷积GAN"><a href="#深度卷积GAN" class="headerlink" title="深度卷积GAN"></a>深度卷积GAN</h1><img src="/2022/12/27/DCGAN/DCGAN%E6%9E%B6%E6%9E%84%E5%9B%BE.png" class="" title="DCGAN架构图">
+
+<p>DCGAN和之前的GAN, CGAN都是一样的系列, 训练原理和过程是基本一样的. 最大的区别在于模型的架构. 在GAN和CGAN中使用的是全连接层来构建模型. 而DCGAN正如其名一样, 是用的卷积神经网络层. 在构造器Generator中使用的是 Convolutional-Transpose 卷积层, 它可以被粗略地理解为一种上采样的卷积操作, 详情参考 <a target="_blank" rel="noopener" href="https://pytorch.org/docs/stable/generated/torch.nn.ConvTranspose2d.html#torch.nn.ConvTranspose2d">PyTorch API</a>. 而鉴别器 Discriminator 并没有一个固定的架构, 就是一个没有池化层的卷积网络.</p>
+<img src="/2022/12/27/DCGAN/DCGAN.png" class="" title="DCGAN生成器">
+<p>值得注意的一点是在生成器的第一步将噪声空间映射到一个1024维的空间时原文并没有给出详细的解释. 使用一个线性层从 (64 * 100) 映射到 (64 * 1024 * 4 * 4) 的特征向量, 其中64为batch_size. 1024 * 4 * 4是因为原文的架构图中就是这样设置的. 这里是需要结合代码进行理解的.</p>
+<h1 id="结果"><a href="#结果" class="headerlink" title="结果"></a>结果</h1><ul>
+<li>MNIST<img src="/2022/12/27/DCGAN/MNIST.png" class="" title="MNIST结果"></li>
+<li>FashionMNIST<img src="/2022/12/27/DCGAN/FashionMNIST.png" class="" title="FashionMNIST结果"></li>
+<li>动漫头像<img src="/2022/12/27/DCGAN/%E5%8A%A8%E6%BC%AB%E5%A4%B4%E5%83%8F.png" class="" title="动漫头像结果">
+<br>
+<img src="/2022/12/27/DCGAN/%E5%8A%A8%E6%BC%AB%E8%AF%A6%E6%83%851.png" class="" title="动漫头像详情结果"></li>
+</ul>
+<h1 id="核心代码"><a href="#核心代码" class="headerlink" title="核心代码"></a>核心代码</h1><h2 id="参数设置"><a href="#参数设置" class="headerlink" title="参数设置"></a>参数设置</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"># 设置参数</span><br><span class="line">parser = argparse.ArgumentParser()</span><br><span class="line"></span><br><span class="line">parser.add_argument(&#x27;--epochs&#x27;, type=int, default=20, help=&#x27;training epochs&#x27;)</span><br><span class="line">parser.add_argument(&#x27;--lr&#x27;, type=float, default=0.0002, help=&#x27;learning rate&#x27;)</span><br><span class="line">parser.add_argument(&quot;--b1&quot;, type=float, default=0.5, help=&quot;adam: decay of first order momentum of gradient&quot;)</span><br><span class="line">parser.add_argument(&quot;--b2&quot;, type=float, default=0.999, help=&quot;adam: decay of first order momentum of gradient&quot;)</span><br><span class="line">parser.add_argument(&#x27;--batch_size&#x27;, type=int, default=128, help=&#x27;batch_size&#x27;)</span><br><span class="line">parser.add_argument(&#x27;--img_size&#x27;, type=int, default=64, help=&#x27;image size&#x27;)</span><br><span class="line">parser.add_argument(&#x27;--channels&#x27;, type=int, default=1, help=&#x27;image channels&#x27;)</span><br><span class="line">parser.add_argument(&#x27;--latent_dim&#x27;, type=int, default=100, help=&#x27;dimension of noise data&#x27;)</span><br><span class="line">parser.add_argument(&#x27;--use_gpu&#x27;, type=bool, default=True, help=&#x27;uer gpu&#x27;)</span><br><span class="line">parser.add_argument(&#x27;--save_path&#x27;, type=str, default=&#x27;imgs&#x27;, help=&#x27;path saving result imgs&#x27;)</span><br><span class="line"></span><br><span class="line">opt = parser.parse_args()</span><br></pre></td></tr></table></figure>
+<h2 id="生成器"><a href="#生成器" class="headerlink" title="生成器"></a>生成器</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"># 生成器</span><br><span class="line">class DC_Generator(nn.Module):</span><br><span class="line">    def __init__(self):</span><br><span class="line">        super().__init__()</span><br><span class="line">        </span><br><span class="line">        def block(in_channels, out_channels, k, stride, padding):</span><br><span class="line">            layers = []</span><br><span class="line">            layers.append(nn.ConvTranspose2d(in_channels, out_channels, kernel_size=k, stride=stride, padding=padding, bias=False))</span><br><span class="line">            layers.append(nn.BatchNorm2d(out_channels))</span><br><span class="line">            layers.append(nn.LeakyReLU(0.2, inplace=True))</span><br><span class="line">            return layers</span><br><span class="line"></span><br><span class="line">        self.init_size = 4</span><br><span class="line">        self.init_channels = 1024</span><br><span class="line"></span><br><span class="line">        # 线性层将100维的噪声数据映射到1024维, 并reshape为1024 * 4 * 4</span><br><span class="line">        self.linear_project = nn.Linear(opt.latent_dim, self.init_channels * self.init_size * self.init_size)</span><br><span class="line"></span><br><span class="line">        self.model = nn.Sequential(</span><br><span class="line">            nn.BatchNorm2d(self.init_channels),</span><br><span class="line">            # input: [64, 1024, 4, 4] -&gt; output: [64, 512, 8, 8]</span><br><span class="line">            *block(1024, 512, 4, 2, 1),</span><br><span class="line">            # input: [64, 512, 8, 8] -&gt; output: [64, 256, 16, 16]</span><br><span class="line">            *block(512, 256, 4, 2, 1),</span><br><span class="line">            # input: [64, 256, 16, 16] -&gt; output: [64, 128, 32, 32]</span><br><span class="line">            *block(256, 128, 4, 2, 1),</span><br><span class="line">            # input: [64, 128, 32, 32] -&gt; output: [64, 1, 64, 64]</span><br><span class="line">            nn.ConvTranspose2d(128, opt.channels, 4, 2, 1, bias=False),</span><br><span class="line">            nn.Tanh()            </span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">    def forward(self, z):</span><br><span class="line">        mid_emb = self.linear_project(z)</span><br><span class="line">        mid_emd = mid_emb.view((z.shape[0], self.init_channels, self.init_size, self.init_size))</span><br><span class="line">        imgs = self.model(mid_emd)</span><br><span class="line">        return imgs</span><br></pre></td></tr></table></figure>
+
+<h2 id="鉴别器"><a href="#鉴别器" class="headerlink" title="鉴别器"></a>鉴别器</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"># 鉴别器</span><br><span class="line">class DC_Discriminator(nn.Module):</span><br><span class="line">    def __init__(self):</span><br><span class="line">        super().__init__()</span><br><span class="line"></span><br><span class="line">        self.model = nn.Sequential(</span><br><span class="line">            # input: [64, 1, 64, 64] -&gt; output: [64, 64, 32, 32]</span><br><span class="line">            nn.Conv2d(1, 64, 4, 2, 1, bias=False),</span><br><span class="line">            nn.BatchNorm2d(64),</span><br><span class="line">            nn.LeakyReLU(0.2, inplace=True),</span><br><span class="line">            # input: [64, 64, 32, 32] -&gt; output: [64, 128, 16, 16]</span><br><span class="line">            nn.Conv2d(64, 128, 4, 2, 1, bias=False),</span><br><span class="line">            nn.BatchNorm2d(128),</span><br><span class="line">            nn.LeakyReLU(0.2, inplace=True),</span><br><span class="line">            # input: [64, 128, 16, 16] -&gt; output: [64, 256, 8, 8]</span><br><span class="line">            nn.Conv2d(128, 256, 4, 2, 1, bias=False),</span><br><span class="line">            nn.BatchNorm2d(256),</span><br><span class="line">            nn.LeakyReLU(0.2, inplace=True),</span><br><span class="line">            # input: [64, 256, 8, 8] -&gt; output: [64, 512, 4, 4]</span><br><span class="line">            nn.Conv2d(256, 512, 4, 2, 1, bias=False),</span><br><span class="line">            nn.BatchNorm2d(512),</span><br><span class="line">            nn.LeakyReLU(0.2, inplace=True),</span><br><span class="line">            # input: [64, 512, 4, 4] -&gt; output: [64, 1, 1, 1]</span><br><span class="line">            nn.Conv2d(512, 1, 4, 2, 0, bias=False),</span><br><span class="line">            nn.Sigmoid()</span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">    def forward(self, imgs):</span><br><span class="line">        result = self.model(imgs)</span><br><span class="line">        return result.view(imgs.shape[0], 1)</span><br></pre></td></tr></table></figure>
+
+<h2 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># 参考自[3]</span><br><span class="line">def weights_init_normal(m):</span><br><span class="line">    classname = m.__class__.__name__</span><br><span class="line">    if classname.find(&quot;Conv&quot;) != -1:</span><br><span class="line">        torch.nn.init.normal_(m.weight.data, 0.0, 0.02)</span><br><span class="line">    elif classname.find(&quot;BatchNorm2d&quot;) != -1:</span><br><span class="line">        torch.nn.init.normal_(m.weight.data, 1.0, 0.02)</span><br><span class="line">        torch.nn.init.constant_(m.bias.data, 0.0)</span><br></pre></td></tr></table></figure>
+
+<h1 id="完整代码"><a href="#完整代码" class="headerlink" title="完整代码"></a>完整代码</h1><p><a target="_blank" rel="noopener" href="https://github.com/Reginald-L/GANs/blob/master/dcgan.py">DCGAN for MNIST完整代码链接</a><br><a target="_blank" rel="noopener" href="https://github.com/Reginald-L/GANs/blob/master/dcgan_fashion_mnist.py">DCGAN for FashionMNIST完整代码链接</a><br><a target="_blank" rel="noopener" href="https://github.com/Reginald-L/GANs/blob/master/dcgan_ac_face.py">DCGAN for 动漫人物头像完整代码链接</a></p>
+<h1 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h1><ol>
+<li><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/Solomon1558/article/details/52573596?spm=1001.2101.3001.6661.1&amp;utm_medium=distribute.pc_relevant_t0.none-task-blog-2~default~CTRLIST~Rate-1-52573596-blog-103371910.pc_relevant_recovery_v2&amp;depth_1-utm_source=distribute.pc_relevant_t0.none-task-blog-2~default~CTRLIST~Rate-1-52573596-blog-103371910.pc_relevant_recovery_v2&amp;utm_relevant_index=1">https://blog.csdn.net/Solomon1558/article/details/52573596?spm=1001.2101.3001.6661.1&amp;utm_medium=distribute.pc_relevant_t0.none-task-blog-2%7Edefault%7ECTRLIST%7ERate-1-52573596-blog-103371910.pc_relevant_recovery_v2&amp;depth_1-utm_source=distribute.pc_relevant_t0.none-task-blog-2%7Edefault%7ECTRLIST%7ERate-1-52573596-blog-103371910.pc_relevant_recovery_v2&amp;utm_relevant_index=1</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://arxiv.org/pdf/1511.06434.pdf">Radford, A., Metz, L., &amp; Chintala, S. (2015). Unsupervised Representation Learning with Deep Convolutional Generative Adversarial Networks. CoRR, abs&#x2F;1511.06434.</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://pytorch.org/tutorials/beginner/dcgan_faces_tutorial.html">PyTorch DCGAN</a></p>
+</li>
+</ol>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Reggie</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://reginald-l.github.io/2022/12/27/DCGAN/">https://reginald-l.github.io/2022/12/27/DCGAN/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2022 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span><strong>I am a slow walker, but I never walk backwards!!!</strong></span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E5%9B%BE%E5%83%8F%E7%94%9F%E6%88%90/"># 图像生成</a>
+                    
+                        <a href="/tags/DCGAN/"># DCGAN</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+            <a class="next" rel="next" href="/2022/12/26/CGAN/">CGAN</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span> Copyright © Reggie | 2022 </span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>
