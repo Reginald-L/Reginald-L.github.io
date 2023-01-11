@@ -712,14 +712,253 @@
 <blockquote>
 <p>Sklearn中的随机森林分类算法<br>sklearn.ensemble.RandomForestClassifier()<br>参数和方法:<br>      1. feature_importances_</p>
 </blockquote>
-<h4 id="朴素贝叶斯"><a href="#朴素贝叶斯" class="headerlink" title="朴素贝叶斯"></a>朴素贝叶斯</h4><ul>
+<h4 id="朴素贝叶斯"><a href="#朴素贝叶斯" class="headerlink" title="朴素贝叶斯"></a>朴素贝叶斯</h4><p>Naive Bayes Classifier</p>
+<ul>
 <li>贝叶斯是为了解决逆向概率的. 逆向概率是指, 我们事先并不知到袋子里黑白球的比例, 而是闭着眼睛摸出一个(或几个)球, 观测这些取出来的球的颜色之后, 推测袋子里黑白球的比例.</li>
-<li>$$ P(A|B) &#x3D; \frac{P(B|A)P(A)}{P(B)} $$</li>
-<li></li>
+<li>$$ P(c|x) &#x3D; \frac{P(x|c)P(c)}{P(x)} &#x3D; \frac{P(c)}{P(x)}\prod_{i&#x3D;1}^d P(x_i|c) $$ d是属性数目. c可以理解为类别class, x是给定的特征属性的取值. 对于每个类别来讲, $P(x)$ 的值是一样的, 所以朴素贝叶斯的目标就是寻找使得 $P(x)\prod_{i&#x3D;1}^d P(x_i|c)$ 最大的 类别 $c$</li>
+<li>$$ P(c) &#x3D; \frac{n(c)}{m} $$ $P(c)$ 表示类别 $c$ 的概率, $n(c)$ 表示数据集中类别 $c$ 的个数, $m$ 表示数据集中的总样本数.</li>
 </ul>
+<p>在分类任务中, 我们的目的是给定一个西瓜样本 $x &#x3D; (x_1, x_2, x_3, x_4)$ 我们去估计这个样本属于哪个类别 $C &#x3D; (c_1, c_2)$, 即我们要求 $P(c_1 | x)$ 和 $P(c_2 | x)$ 中的最大值. 根据上面的贝叶斯公式, 我们需要估计 $P(c)$ 和 $P(x_i | c)$. 通过观测训练样本集 $20$ 个样本, 可以发现 $类别 &#x3D; c_1$ 的有 $11$ 个样本, i.e., $P(c_1) &#x3D; \frac{11}{20}$.  $类别 &#x3D; c_2$ 的有 $9$ 个样本, i.e., $P(c_2) &#x3D; \frac{9}{20}$.  关于 $P(x_i|c)$ 分为离散和连续两种. 针对离散的数据, $$P(x_i|c) &#x3D; \frac{n(c, x_i)}{n(c)}$$. 连续的数据使用概率密度公式进行估计, 比如高斯分布的概率密度 $$p(x_i | c) &#x3D; \frac{1}{\sqrt{2\pi}\sigma_{c, i}}exp(-\frac{(x_i - \mu_{c, i})^2}{2\sigma_{c, i}^2})$$</p>
+<blockquote>
+<p>案例:<br>数据集如下:</p>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>色泽</th>
+<th>根蒂</th>
+<th>敲声</th>
+<th>纹理</th>
+<th>好瓜</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>青绿</td>
+<td>蜷缩</td>
+<td>浊响</td>
+<td>清晰</td>
+<td>是</td>
+</tr>
+<tr>
+<td>2</td>
+<td>乌黑</td>
+<td>蜷缩</td>
+<td>沉闷</td>
+<td>清晰</td>
+<td>是</td>
+</tr>
+<tr>
+<td>3</td>
+<td>乌黑</td>
+<td>蜷缩</td>
+<td>浊响</td>
+<td>清晰</td>
+<td>是</td>
+</tr>
+<tr>
+<td>4</td>
+<td>青绿</td>
+<td>蜷缩</td>
+<td>沉闷</td>
+<td>清晰</td>
+<td>是</td>
+</tr>
+<tr>
+<td>5</td>
+<td>浅白</td>
+<td>蜷缩</td>
+<td>浊响</td>
+<td>清晰</td>
+<td>是</td>
+</tr>
+<tr>
+<td>6</td>
+<td>青绿</td>
+<td>稍蜷</td>
+<td>浊响</td>
+<td>清晰</td>
+<td>是</td>
+</tr>
+<tr>
+<td>7</td>
+<td>乌黑</td>
+<td>稍蜷</td>
+<td>浊响</td>
+<td>稍糊</td>
+<td>是</td>
+</tr>
+<tr>
+<td>8</td>
+<td>乌黑</td>
+<td>稍蜷</td>
+<td>浊响</td>
+<td>清晰</td>
+<td>是</td>
+</tr>
+<tr>
+<td>9</td>
+<td>乌黑</td>
+<td>稍蜷</td>
+<td>沉闷</td>
+<td>稍糊</td>
+<td>否</td>
+</tr>
+<tr>
+<td>10</td>
+<td>青绿</td>
+<td>硬挺</td>
+<td>清脆</td>
+<td>清晰</td>
+<td>否</td>
+</tr>
+<tr>
+<td>11</td>
+<td>浅白</td>
+<td>硬挺</td>
+<td>清脆</td>
+<td>模糊</td>
+<td>否</td>
+</tr>
+<tr>
+<td>12</td>
+<td>浅白</td>
+<td>蜷缩</td>
+<td>浊响</td>
+<td>模糊</td>
+<td>否</td>
+</tr>
+<tr>
+<td>13</td>
+<td>青绿</td>
+<td>稍蜷</td>
+<td>浊响</td>
+<td>稍糊</td>
+<td>否</td>
+</tr>
+<tr>
+<td>14</td>
+<td>浅白</td>
+<td>稍蜷</td>
+<td>沉闷</td>
+<td>稍糊</td>
+<td>否</td>
+</tr>
+<tr>
+<td>15</td>
+<td>乌黑</td>
+<td>稍蜷</td>
+<td>浊响</td>
+<td>模糊</td>
+<td>否</td>
+</tr>
+<tr>
+<td>16</td>
+<td>浅白</td>
+<td>蜷缩</td>
+<td>浊响</td>
+<td>模糊</td>
+<td>否</td>
+</tr>
+<tr>
+<td>17</td>
+<td>青绿</td>
+<td>蜷缩</td>
+<td>沉闷</td>
+<td>稍糊</td>
+<td>否</td>
+</tr>
+</tbody></table>
+<p>给定的样本为 $x $ &#x3D; (青绿, 稍蜷, 浊响, 清晰)<br>目标: 判定样本 $x$ 是属于 好瓜 or 坏瓜<br>朴素贝叶斯分类过程:</p>
+<ol>
+<li>估计 $P(c)$, 样本一共是17个数据, 类别共两个(好瓜 &#x2F; 坏瓜), 其中好瓜的个数为8, 坏瓜的个数为9, 则 $P(c&#x3D;好瓜) &#x3D; \frac{8}{17}$, $P(c&#x3D;坏瓜) &#x3D; \frac{9}{17}$ </li>
+<li>估计 $P(x_i|c)$. 每个样本一共有 4 个属性, 所以 <ul>
+<li>$P(色泽&#x3D;青绿 | 好瓜) &#x3D; \frac{3}{8}$</li>
+<li>$P(根蒂&#x3D;稍蜷 | 好瓜) &#x3D; \frac{4}{8}$ </li>
+<li>$P(敲声&#x3D;浊响 | 好瓜) &#x3D; \frac{6}{8}$</li>
+<li>$P(纹理&#x3D;清晰 | 好瓜) &#x3D; \frac{7}{8}$</li>
+<li>$P(色泽&#x3D;青绿 | 坏瓜) &#x3D; \frac{3}{9}$</li>
+<li>$P(根蒂&#x3D;稍蜷 | 坏瓜) &#x3D; \frac{4}{9}$ </li>
+<li>$P(敲声&#x3D;浊响 | 坏瓜) &#x3D; \frac{4}{9}$</li>
+<li>$P(纹理&#x3D;清晰 | 坏瓜) &#x3D; \frac{2}{9}$</li>
+</ul>
+</li>
+<li>计算 $P(c&#x3D;好瓜 | x)$ 和 $P(c&#x3D;坏瓜|x)$ 的概率值. <ul>
+<li>$P(c&#x3D;好瓜|x) &#x3D; P(c&#x3D;好瓜)\prod_{i&#x3D;1}^4(P(x_i|好瓜)) &#x3D; \frac{8}{17} × \frac{3}{8} × \frac{4}{8} × \frac{6}{8} × \frac{7}{8} $</li>
+<li>$P(c&#x3D;坏瓜|x) &#x3D; P(c&#x3D;坏瓜)\prod_{i&#x3D;1}^4(P(x_i|坏瓜)) &#x3D; \frac{9}{17} × \frac{3}{9} × \frac{4}{9} × \frac{4}{9} × \frac{2}{9} $</li>
+</ul>
+</li>
+<li>因为 $ P(c&#x3D;好瓜|x) $ &gt; $P(c&#x3D;坏瓜|x) $, 所以样本 $x$ 的类别应该为好瓜.</li>
+</ol>
+</blockquote>
+<blockquote>
+<p>Sklearn中的朴素贝叶斯算法</p>
+<ol>
+<li>高斯朴素贝叶斯: sklearn.naive_bayes.GaussianNB(priors&#x3D;None)<ul>
+<li>适合符合高斯分布的数据, 比如身高</li>
+<li>在小数据集表现很好, 可以进行多类别分类.<br> 参数和方法:<ul>
+<li>priors: 给定各个类别的先验概率, 若为空, 则按照训练数据的实际情况进行统计. 若给定先验概率, 则在训练过程中不能更改.</li>
+<li>fit(X, y): 训练模型</li>
+<li>predict(x): 预测数据</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>多项式朴素贝叶斯: sklearn.naive_bayes.MultinomialNB()<ul>
+<li>适合文本分类</li>
+</ul>
+</li>
+<li>伯努利朴素贝叶斯: sklearn.naive_bayes.BernoulliNB()<ul>
+<li>适合多个特征, 且每个特征的值为binary类型的.</li>
+</ul>
+</li>
+</ol>
+</blockquote>
 <h2 id="回归"><a href="#回归" class="headerlink" title="回归"></a>回归</h2><p>回归方法适合对一些带有时序信息的数据进行预测或者趋势进行拟合, 常用于金融及其他涉及时间序列的领域.</p>
-<h3 id="评价指标-1"><a href="#评价指标-1" class="headerlink" title="评价指标"></a>评价指标</h3><p>均方误差. 回归任务通常使用的是均方误差作为评估指标, i.e.,</p>
-<p>$$ E(f;D) &#x3D; \frac{1}{m}\sum_{i&#x3D;1}^m(f(x_i) - y_i)^2 $$</p>
+<h3 id="评价指标-1"><a href="#评价指标-1" class="headerlink" title="评价指标"></a>评价指标</h3><p>均方误差. 回归任务通常使用的是均方误差作为评估指标, i.e.,<br>$$ E(f;D) &#x3D; \frac{1}{m}\sum_{i&#x3D;1}^m(f(x_i) - y_i)^2 $$</p>
+<h3 id="经典回归算法"><a href="#经典回归算法" class="headerlink" title="经典回归算法"></a>经典回归算法</h3><h4 id="线性回归"><a href="#线性回归" class="headerlink" title="线性回归"></a>线性回归</h4><ul>
+<li><p>线性回归, Linear Regression是利用数理统计中回归分析, 来确定两种或者两种以上变量相互依赖的定量关系的一种统计分析方法.</p>
+</li>
+<li><p>线性回归就是利用 形如 $y &#x3D; w^Tx + b$ 的线性模型来拟合数据输入和输出之间的映射关系.</p>
+</li>
+</ul>
+<blockquote>
+<p>Sklearn中的线性回归:<br>sklearn.linear_model.LinearRegression()</p>
+<ul>
+<li>fit_intercept: bool型参数, 表示是否计算该模型截距, 可选参数</li>
+<li>normalize: bool型参数, True表示X在回归前进行归一化, 可选参数, 默认为False</li>
+<li>fit(X, y): 拟合数据, 即训练模型</li>
+<li>coef_ : 模型属性, 可以查看回归方程系数</li>
+<li>intercept_: 模型属性, 可以查看回归方程截距</li>
+</ul>
+</blockquote>
+<h4 id="多项式回归"><a href="#多项式回归" class="headerlink" title="多项式回归"></a>多项式回归</h4><p>Polynomial Regression是研究一个因变量与一个或多个自变量之间的多项式的回归分析方法. 若只有一个自变量, 则称为一元多项式回归; 若自变量是多个时, 称为多元多项式回归.</p>
+<p>相比于前面的线性回归, 多项式回归是使用曲线拟合数据的输入和输出之间的映射关系.</p>
+<ul>
+<li>一元m次多项式回归方程: $\hat{y} &#x3D; b_0 + b_1 x + b_2 x^2 + b_3 x^3 + … + b_m x^m$</li>
+<li>二元二次多项式回归方程: $\hat{y} &#x3D; b_0 + b_1 x_1 + b_2 x_2 + b_3 x_1^2 + b_4 x_2^2 + b_5 x_1 x_2$</li>
+</ul>
+<p>在一元回归分析中, 若因变量 $y$ 和自变量 $x$ 的关系为非线性, 但是又找不到适当的曲线来拟合, 则可以采用一元多项式回归.</p>
+<p>优点:<br>    - 多项式回归的最大优点就是可以通过增加 $X$ 的高次项对实测点进行逼近, 直到满意为止.<br>    - 任意一个函数, 都可以用分段或者多项式来逼近</p>
+<blockquote>
+<p>Sklearn中的多项式回归:<br>sklearn.preprocessing.PolynomialFeatures(degree&#x3D;2)</p>
+<ul>
+<li>degree: 表示建立数据X的二次多项特征. 需要进行多次实验进行比较决定该参数的取值.</li>
+<li>fit_transform(X): 计算X的多项式特征<br>sklearn中的多项式回归实际上是先将变量 $X$ 处理为多项式特征, 然后使用线性模型学习多项式特征的参数, 以达到多项式回归的目的.<br>比如: $X &#x3D; [x_1, x_2]$, 通过使用PolynomialFeatures构造 $X$ 的二次多项式特征 $X\_Poly$, 则 $X\_Poly &#x3D; [x_1, x_2, x_1x_2, x_1^2, x_2^2]$, 然后使用线性模型学习 $X\_Ploy$ 和 $y$ 之间的映射关系, 即下列公式中的参数 $[w_1, w_2, w_3, w_4, w_5]$. $$ \hat{y} &#x3D; w_1x_1 + w_2x_2 + w_3x_1x_2 + w_4x_1^2 + w_5x_2^2 $$</li>
+</ul>
+</blockquote>
+<h4 id="岭回归"><a href="#岭回归" class="headerlink" title="岭回归"></a>岭回归</h4><p>解决最小二乘法的不稳定性.</p>
+<p>优化目标:<br>    $$argmin || Xw - y ||^2 + \alpha||w||^2$$<br>就是在平方误差的基础上增加了正则项<br>$$ w &#x3D; (X^TX + \alpha I)^{-1} X^Ty $$</p>
+<blockquote>
+<p>Sklearn中的岭回归:<br>sklearn.linear_model.Ridge()<br>参数:</p>
+<ul>
+<li>alpha: 正则化因子, 对应于损失函数中的 $\alpha$</li>
+<li>fit_intercept: 是否要计算截距</li>
+<li>solver: 设置计算参数的方法, 可选”auto”, “svd”, “sag”</li>
+<li>fit(X, y): 拟合数据</li>
+<li>score(test_X, test_y): 计算测试集中的回归曲线拟合优度. 用于评价拟合好坏, 最大为1, 没有最小值, 当对所有输入都输出同一个值时, 拟合优度为0</li>
+</ul>
+</blockquote>
 <h1 id="Reference-List"><a href="#Reference-List" class="headerlink" title="Reference List"></a>Reference List</h1><ol>
 <li><a target="_blank" rel="noopener" href="https://scikit-learn.org/stable/datasets.html">https://scikit-learn.org/stable/datasets.html</a></li>
 <li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/108393576">https://zhuanlan.zhihu.com/p/108393576</a></li>
