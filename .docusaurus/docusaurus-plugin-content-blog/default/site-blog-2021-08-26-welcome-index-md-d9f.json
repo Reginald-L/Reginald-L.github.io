@@ -1,0 +1,45 @@
+{
+  "permalink": "/welcome",
+  "source": "@site/blog/2021-08-26-welcome/index.md",
+  "title": "Welcome",
+  "description": "Docusaurus blogging features are powered by the blog plugin.",
+  "date": "2021-08-26T00:00:00.000Z",
+  "formattedDate": "August 26, 2021",
+  "tags": [
+    {
+      "label": "facebook",
+      "permalink": "/tags/facebook"
+    },
+    {
+      "label": "hello",
+      "permalink": "/tags/hello"
+    },
+    {
+      "label": "docusaurus",
+      "permalink": "/tags/docusaurus"
+    }
+  ],
+  "readingTime": 0.405,
+  "hasTruncateMarker": false,
+  "authors": [
+    {
+      "name": "Reggie",
+      "url": "https://github.com/Reginald-L",
+      "imageURL": "https://avatars.githubusercontent.com/u/67569154?s=400&u=f5ac24204bcae51744cbed83d7afde7f7551aa16&v=4",
+      "key": "Reggie"
+    }
+  ],
+  "frontMatter": {
+    "slug": "welcome",
+    "title": "Welcome",
+    "authors": [
+      "Reggie"
+    ],
+    "tags": [
+      "facebook",
+      "hello",
+      "docusaurus"
+    ]
+  },
+  "unlisted": false
+}
