@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkreggie_blog=self.webpackChunkreggie_blog||[]).push([[765],{7650:e=>{e.exports=JSON.parse('[{"label":"facebook","permalink":"/Reginald-L.github.io/tags/facebook","count":1},{"label":"hello","permalink":"/Reginald-L.github.io/tags/hello","count":1},{"label":"docusaurus","permalink":"/Reginald-L.github.io/tags/docusaurus","count":1}]')}}]);
