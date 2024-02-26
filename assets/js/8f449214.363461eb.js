@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkreggie_blog=self.webpackChunkreggie_blog||[]).push([[795],{4108:e=>{e.exports=JSON.parse('{"label":"hello","permalink":"/Reginald-L.github.io/tags/hello","allTagsPath":"/Reginald-L.github.io/tags","count":1,"unlisted":false}')}}]);

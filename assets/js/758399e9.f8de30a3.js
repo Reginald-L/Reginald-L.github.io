@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkreggie_blog=self.webpackChunkreggie_blog||[]).push([[944],{9763:e=>{e.exports=JSON.parse('{"permalink":"/Reginald-L.github.io/tags/hello","page":1,"postsPerPage":10,"totalPages":1,"totalCount":1,"blogDescription":"Blog","blogTitle":"Blog"}')}}]);

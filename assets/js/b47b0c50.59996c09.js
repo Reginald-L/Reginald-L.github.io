@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkreggie_blog=self.webpackChunkreggie_blog||[]).push([[753],{7548:e=>{e.exports=JSON.parse('{"permalink":"/Reginald-L.github.io/tags/docusaurus","page":1,"postsPerPage":10,"totalPages":1,"totalCount":1,"blogDescription":"Blog","blogTitle":"Blog"}')}}]);
